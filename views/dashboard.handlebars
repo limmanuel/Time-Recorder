@@ -1,0 +1,236 @@
+</div>
+<div>
+<div class="row">
+<div id="Home" class="col s12">
+{{#each user}}
+<div class="col xl3 l4 m6 s12">
+<div class="card horizontal badge">
+	<div class="card-image" style="width: 100px; height: 100px; overflow:hidden">
+		<img src="{{img}}">
+	</div>
+	<div class="card-stacked">
+		<div class="card-content"><b>
+			{{#each ../log}}
+				{{#equal user_id ../id}}
+					{{#each status}}
+						{{#equal (addOne @index) ../status.length}}
+							{{#equal status 'Present'}}
+								<p id="status" class="waves-effect waves-light col m12 blue dashboard">
+									{{../../first_name}} {{../../last_name}}<br>
+									{{../../email}} <br>
+									{{../../position}}<br>
+									{{status}}</p>
+							{{/equal}}
+							{{#equal status 'Late'}}
+								<p id="status" class="waves-effect waves-light col m12 orange dashboard">
+									{{../../first_name}} {{../../last_name}}<br>
+									{{../../email}} <br>
+									{{../../position}}<br>
+									{{status}}</p>
+							{{/equal}}
+							{{#equal status 'Sick'}}
+								<p id="status" class="waves-effect waves-light col m12 green dashboard">
+									{{../../first_name}} {{../../last_name}}<br>
+									{{../../email}} <br>
+									{{../../position}}<br>
+									{{status}}</p>
+							{{/equal}}
+							{{#equal status 'Vacation'}}
+								<p id="status" class="waves-effect waves-light col m12 red dashboard">
+									{{../../first_name}} {{../../last_name}}<br>
+									{{../../email}} <br>
+									{{../../position}}<br>
+									{{status}}</p>
+							{{/equal}}
+							{{#equal status 'Absent'}}
+								<p id="status" class="waves-effect waves-light col m12 grey dashboard">
+									{{../../first_name}} {{../../last_name}}<br>
+									{{../../email}} <br>
+									{{../../position}}<br>
+									{{status}}</p>
+							{{/equal}}
+						{{/equal}}
+					{{/each}}
+				{{/equal}}
+			{{/each}}
+		</b></div>
+	</div>
+</div>
+</div>
+{{/each}}
+</div>
+</div>
+<div id="History" class="col s12 container">
+<form method="post" action="/{{team.team}}/{{user_id}}/dashboard/filter" class="row">
+	<div class="form-group col s3">
+		<select name="filterMonth">
+			<option value="{{moment dates 'MM'}}" selected>Select Month</option>
+			<option value="01">January</option>
+			<option value="02">Febuary</option>
+			<option value="03">March</option>
+			<option value="04">April</option>
+			<option value="05">May</option>
+			<option value="06">June</option>
+			<option value="07">July</option>
+			<option value="08">August</option>
+			<option value="09">September</option>
+			<option value="10">October</option>
+			<option value="11">November</option>
+			<option value="12">December</option>
+		</select>
+	</div>
+	<div class="form-group col s3">
+		<select name="filterStatus">
+			<option value="all" selected>Select Status</option>
+			<option value="Present">Present</option>
+			<option value="Late">Late</option>
+			<option value="Sick">Sick</option>
+			<option value="Leave">Leave</option>
+		</select>
+	</div>
+	<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col">Filter</button>
+</form>
+<table class="responsive-table striped col m12">
+	<tr>
+		<th>Name</th>
+		<th>Date</th>
+		<th>Time In</th>
+		<th>Time Out</th>
+		<th>Status</th>
+	</tr>
+{{#each logs}}
+	{{#each ../user}}
+		{{#equal id ../user_id}}
+			{{#each ../status}}
+				{{#if status}}
+					{{#equal ../../../filterMonth (moment ../../../dates 'MM')}}
+						{{#equal ../../../filterStatus 'all'}}
+							<tr>
+								<td>
+									{{../first_name}} {{../last_name}}
+								</td>
+								<td>
+									{{moment ../../date 'MMM DD YYYY'}}
+								</td>
+								<td>
+									{{#each ../../timein}}
+										{{#equal @../index @index}}
+											{{#equal timein 'N/A'}}
+												{{timein}}
+											{{else}}
+												{{moment (add ../../../date timein) 'hh:mm:ss A'}}
+											{{/equal}}
+										{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{#each ../../timeout}}
+										{{#equal @../index @index}}
+											{{#equal timeout 'N/A'}}
+												{{timeout}}
+											{{else}}
+												{{moment (add ../../../date timeout) 'hh:mm:ss A'}}
+											{{/equal}}
+										{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{status}}
+								</td>
+							</tr>
+						{{else}}
+							<tr>
+								<td>
+									{{../../first_name}} {{../../last_name}}
+								</td>
+								<td>
+									{{moment ../date 'MMM DD YYYY'}}
+								</td>
+								<td>
+									{{#each ../timein}}
+										{{#equal @../index @index}}
+											{{#equal timein 'N/A'}}
+												{{timein}}
+											{{else}}
+												{{moment (add ../../date timein) 'hh:mm:ss A'}}
+											{{/equal}}
+										{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{#each ../timeout}}
+										{{#equal @../index @index}}
+											{{#equal timeout 'N/A'}}
+												{{timeout}}
+											{{else}}
+												{{moment (add ../../date timeout) 'hh:mm:ss A'}}
+											{{/equal}}
+										{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{status}}
+								</td>
+							</tr>
+						{{/equal}}
+					{{/equal}}
+				{{/if}}
+			{{/each}}
+		{{/equal}}
+	{{/each}}
+{{/each}}
+</table>
+</div>
+{{#equal wuser.position 'User'}}
+{{else}}
+<div id="Form" class="col s12 container">
+<table class="col m12">
+	<tr>
+		<th>Name</th>
+		<th>Date Requested</th>
+		<th>Leave Request</th>
+		<th>Status</th>
+		<th></th>
+	</tr>
+{{#each user}}
+	{{#each ../forms}}
+		{{#equal ../id user_id}}
+			<tr>
+				<td>{{../first_name}} {{../last_name}}</td>
+				<td>{{moment date 'MMM DD, YYYY'}}</td>
+				<td>{{moment leave_date 'MMM DD, YYYY'}}</td>
+				<td>{{leave_status}}</td>
+				<td>
+					<button class="btn blue waves-effect waves-light delete-form" data-target="form{{_id}}">Update</button>
+				</td>
+				<div id="form{{_id}}" class="modal modal-fixed-footer">
+					<form method="post" action="/{{../../team.team}}/{{../../user_id}}/dashboard/leave/form/{{user_id}}/update/{{_id}}">
+						<div class="modal-content">
+							<div class="form-group">
+								<b>Date Requested: </b><h6>{{moment date_requested 'MMM DD, YYYY'}}</h6>
+								<input type="hidden" name="date_requested" value="{{date_requested}}">
+								<b>Leave Date: </b><h6>{{moment leave_date 'MMM DD, YYYY'}}</h6>
+								<input type="hidden" name="leave_date" value="{{leave_date}}">
+								<b>Mesage: </b><h6>{{message}}</h6>
+								<input type="hidden" name="message" value="{{message}}">
+							</div>
+							<div class="form-group">
+								<select name="leave_status" class="browser-default">
+									<option value="approve" selected>Approve</option>
+									<option value="deny">Deny</option>
+								</select>
+							</div>
+						</div>
+						<div class="modal-footer">
+								<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Submit</button>
+								<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+						</div>
+					</form>
+				</div>
+			</tr>
+		{{/equal}}
+	{{/each}}
+{{/each}}
+</table>
+</div>
+{{/equal}}

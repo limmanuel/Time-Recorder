@@ -1,0 +1,27 @@
+
+<div class="row valign-wrapper">
+	<div id="nav-mobile" class="col s8 offset-s2">
+		<form method="post" action="/login" class="col s12">
+			<div class="form-group">
+				<label for="team">Team: </label>
+				<select class="form-control" type="text" name="team">
+    				<option value="" disabled selected>Choose your team</option>
+					{{#each account}}
+						<option value="{{team}}">{{team}}</option>
+					{{/each}}
+				</select>
+			</div>
+			<div class="input-field">
+				<label> Username: </label>
+				<input id="username" class="form-control" type="text" name="username" placeholder="Username" autofocus>
+			</div>
+			<div class="input-field">
+				<label> Password: </label>
+				<input id="password" class="form-control" type="password" name="password" placeholder="Password">
+			</div>
+			<div class="row">
+				<button type="submit" class="waves-effect waves-light btn col s12">Login</button>
+			</div>
+		</form>
+	</div>
+</div>

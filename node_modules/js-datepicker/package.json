@@ -1,0 +1,101 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "js-datepicker",
+        "scope": null,
+        "escapedName": "js-datepicker",
+        "name": "js-datepicker",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "C:\\Users\\Lee\\Desktop\\lopez\\time recorder\\public"
+    ]
+  ],
+  "_from": "js-datepicker@latest",
+  "_id": "js-datepicker@1.6.1",
+  "_inCache": true,
+  "_location": "/js-datepicker",
+  "_nodeVersion": "7.1.0",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/js-datepicker-1.6.1.tgz_1493935882177_0.9516473510302603"
+  },
+  "_npmUser": {
+    "name": "qodesmith",
+    "email": "theqodesmith@gmail.com"
+  },
+  "_npmVersion": "4.5.0",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "js-datepicker",
+    "scope": null,
+    "escapedName": "js-datepicker",
+    "name": "js-datepicker",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/js-datepicker/-/js-datepicker-1.6.1.tgz",
+  "_shasum": "e11e0168922d3b0de6dbd4190e0e30b7fd39d9ac",
+  "_shrinkwrap": null,
+  "_spec": "js-datepicker",
+  "_where": "C:\\Users\\Lee\\Desktop\\lopez\\time recorder\\public",
+  "author": {
+    "name": "Qodesmith"
+  },
+  "bugs": {
+    "url": "https://github.com/qodesmith/datepicker/issues"
+  },
+  "dependencies": {},
+  "description": "Get a date with JavaScript! A datepicker with no dependencies.",
+  "devDependencies": {
+    "babel-preset-latest": "^6.22.0",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat-util": "^0.5.5",
+    "gulp-less": "^3.3.0",
+    "uglify-js": "^2.7.5"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "e11e0168922d3b0de6dbd4190e0e30b7fd39d9ac",
+    "tarball": "https://registry.npmjs.org/js-datepicker/-/js-datepicker-1.6.1.tgz"
+  },
+  "email": "theqodesmith@gmail.com",
+  "gitHead": "87523d8744991ec7a97bfefe4ccc2f4fe558b916",
+  "homepage": "https://github.com/qodesmith/datepicker#readme",
+  "keywords": [
+    "datepicker",
+    "date picker",
+    "date",
+    "picker",
+    "calendar",
+    "javascript",
+    "vanilla"
+  ],
+  "license": "ISC",
+  "main": "datepicker.js",
+  "maintainers": [
+    {
+      "name": "qodesmith",
+      "email": "theqodesmith@gmail.com"
+    }
+  ],
+  "name": "js-datepicker",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qodesmith/datepicker.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.6.1"
+}

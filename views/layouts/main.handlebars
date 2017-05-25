@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Wizy Test</title>
+		<link rel="stylesheet" href="/css/materialize.css">
+		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/js/js-datepicker/datepicker.css">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	</head>
+	<body onload="updateClock(); setInterval('updateClock()', 1000 )">
+		<div class="navbar-fixed">
+			<nav class="nav-extended">
+		      <div class="nav-wrapper grey darken-3">
+		        <a class="brand-logo center" href="#">
+		        <div class="live_clock" id="live_clock">
+					<span>{{moment dates 'ddd,  MMM DD'}}</span>&nbsp;
+					<span id="clock">&nbsp;</span>
+		    	</div></a>
+		    	<a href="#" data-activates="mobile-demo" class="button-collapse show-on-large">
+		        <i class="material-icons">menu</i></a>
+		          <ul id="nav-mobile" class="right hide-on-med-and-down">
+		          	{{#if wuser}}
+            			<li><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
+				    	<li><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
+				    	<li><a href="/logout">Logout</a></li>
+		          	{{else}}
+		            	<li><a href="/login">Login</a></li>
+		            	<li><a href="/register">Register</a></li>
+		            {{/if}}
+		          </ul>
+		      </div>
+		      	{{#equal page 'profile'}}
+				<ul class="tabs tabs-transparent grey darken-3">
+		      	{{#equal tab 'home'}}
+					<li class="tab"><a class="active" href="#Home">Home</a></li>
+				{{else}}
+					<li class="tab"><a href="#Home">Home</a></li>
+				{{/equal}}
+		      	{{#equal tab 'history'}}
+					<li class="tab"><a class="active" href="#History">History</a></li>
+				{{else}}
+					<li class="tab"><a href="#History">History</a></li>
+				{{/equal}}
+		      	{{#equal tab 'form'}}
+					<li class="tab"><a class="active" href="#Form">Form</a></li>
+				{{else}}
+					<li class="tab"><a href="#Form">Form</a></li>
+				{{/equal}}
+		      	{{#equal tab 'settings'}}
+					<li class="tab"><a class="active" href="#Settings">Settings</a></li>
+				{{else}}
+					<li class="tab"><a href="#Settings">Settings</a></li>
+				{{/equal}}
+					<li class="tab disabled right"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
+					<li class="tab disabled right"><a href="#">Schedule: </a></li>
+				</ul>
+				{{/equal}}
+		      	{{#equal page 'dashboard'}}
+				<ul class="tabs tabs-transparent grey darken-3">
+		      	{{#equal tab 'home'}}
+					<li class="tab"><a class="active" href="#Home">Home</a></li>
+				{{else}}
+					<li class="tab"><a href="#Home">Home</a></li>
+				{{/equal}}
+		      	{{#equal tab 'history'}}
+					<li class="tab"><a class="active" href="#History">History</a></li>
+				{{else}}
+					<li class="tab"><a href="#History">History</a></li>
+				{{/equal}}
+				{{#equal wuser.position 'User'}}
+					<li class="tab disabled"><a href="#Form">Form</a></li>
+				{{else}}
+			      	{{#equal tab 'form'}}
+						<li class="tab"><a class="active" href="#Form">Form</a></li>
+					{{else}}
+						<li class="tab"><a href="#Form">Form</a></li>
+					{{/equal}}
+				{{/equal}}
+						<li class="tab disabled right"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
+						<li class="tab disabled right"><a href="#">Schedule: </a></li>
+					</ul>
+				{{/equal}}
+		      	{{#equal page 'admin'}}
+					<ul class="tabs tabs-transparent grey darken-3">
+			      	{{#equal tab 'user'}}
+						<li class="tab"><a class="active" href="#User">Manage User</a></li>
+					{{else}}
+						<li class="tab"><a href="#User">Manage User</a></li>
+					{{/equal}}
+			      	{{#equal tab 'Account'}}
+						<li class="tab"><a class="active" href="#Account">Account Settings</a></li>
+					{{else}}
+						<li class="tab"><a href="#Account">Account Settings</a></li>
+					{{/equal}}
+						<li class="tab disabled right"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
+						<li class="tab disabled right"><a href="#">Schedule: </a></li>
+					</ul>
+				{{/equal}}
+		    </nav>
+		</div>
+        <ul class="side-nav" id="mobile-demo">
+          	{{#if wuser}}
+			    <li>
+				    <div class="userView">
+				        <div class="background">
+				        	<img src="https://ak5.picdn.net/shutterstock/videos/699709/thumb/1.jpg" width="100%">
+				        </div>
+				        <a href="/{{wuser.team}}/{{wuser._id}}"><img class="circle" src="https://www.watsonmartin.com/wp-content/uploads/2016/03/default-profile-picture.jpg"></a>
+				        <a href="#!name"><span class="white-text name">{{wuser.first_name}} {{wuser.last_name}}</span></a>
+				        <a href="#!email"><span class="white-text email">{{wuser.email}}</span></a>
+				    </div>
+			    </li>
+            	<li><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
+            	{{#equal wuser.position 'User'}}
+            	{{else}}
+            		<li><a href="/{{team.team}}/{{user_id}}/create">Create Users</a></li>
+            		<li><a href="/{{team.team}}/{{user_id}}/admin">Admin</a></li>
+            	{{/equal}}
+            	<li><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
+            	<li><a href="/logout">Logout</a></li>
+          	{{else}}
+            	<li><a href="/login">Login</a></li>
+            	<li><a href="/register">Register</a></li>
+            {{/if}}
+        </ul>
+		<div class="row"><br><br>
+			{{#if success_msg}}
+				<div class="col s4 offset-s4 btn round green darken-1">{{success_msg}}</div>
+			{{/if}}
+			{{#if error_msg}}
+				<div class="col s4 offset-s4 btn round red darken-1">{{error_msg}}</div>
+			{{/if}}
+			{{#if error}}
+				<div class="col s4 offset-s4 btn round red darken-1">{{error}}</div>
+			{{/if}}
+			{{#if errors}}
+				{{#each errors}}
+					<div class="col s4 offset-s4 btn round red darken-1">{{msg}}</div><br>
+				{{/each}}
+			{{/if}}<br><br>
+		</div>
+		<div class="container">
+			{{{body}}}
+		</div>
+		<script src="/bower_components/jquery/dist/jquery.js"></script>
+		<script src="/js/main.js"></script>
+		<script src="/js/materialize.js"></script>
+		<script src="/js/js-datepicker/datepicker.js"></script>
+	</body>
+</html>

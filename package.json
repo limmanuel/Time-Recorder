@@ -1,0 +1,28 @@
+{
+  "name": "time",
+  "version": "1.0.0",
+  "description": "Gets Time In and Out",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app"
+  },
+  "author": "Limmanuel Lopez",
+  "license": "ISC",
+  "dependencies": {
+  	"body-parser": "*",
+  	"mongoose": "*",
+  	"connect-flash": "*",
+  	"express": "*",
+  	"express-messages": "*",
+  	"express-session": "*",
+  	"express-handlebars": "*",
+  	"express-validator": "*",
+  	"passport": "*",
+  	"passport-local": "*",
+  	"passport-http": "*",
+  	"bcryptjs": "*",
+    "mongodb": "*",
+    "moment": "*"
+  }
+}

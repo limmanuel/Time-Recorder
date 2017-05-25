@@ -1,0 +1,344 @@
+
+<div class="row">
+<div id="Home" class="col s12">
+	<div class="col m4" style="width:300px;">
+		<div class="grey darken-3" style="border-radius: 5px;">
+			<a class="waves-effect waves-light tooltipped" data-position="left" data-delay="50" data-tooltip="Change your profile picture" data-target="img" href="#">
+				<div style="padding:10px; overflow:hidden">
+					<img src="{{user.img}}" alt="profile" border="0" width="100%">
+				</div>
+			</a>
+			<div id="img" class="modal">
+				<form method="post" action="/{{team.team}}/{{user_id}}/image">
+					<div class="modal-content">
+						<div style="height: 200px; width: 200px; overflow:hidden">
+							<img src="{{user.img}}" width="100%">
+						</div>
+						<label>Link:</label>
+						<input name="image" type="text" value="{{user.img}}">
+					</div>
+					<div class="modal-footer">
+							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
+							<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					</div>
+				</form>
+			</div>
+			<div class="row">
+				<p class="col waves-effect waves-light s12 cyan float" style="margin-top: -25px;">
+					<b>Name:</b> {{user.first_name}} {{user.last_name}}<br>
+					<b>Email:</b> {{user.email}} <br>
+					<b>Position:</b> {{user.position}}
+				</p>
+				<p class="col m12 waves-effect waves-light blue" style="margin-top: -15px;">
+					<b>Time In: </b>
+					{{#each log.timein}}
+						{{#equal (addOne @index) ../log.timein.length}}
+							{{#equal timein 'N/A'}}
+								{{timein}}
+							{{else}}
+								{{moment (add ../dates timein) 'hh:mm:ss A'}}
+							{{/equal}}
+						{{/equal}}
+					{{/each}}<br>
+					<b>Time Out: </b>
+					{{#each log.timeout}}
+						{{#equal (addOne @index) ../log.timein.length}}
+							{{#equal timeout 'N/A'}}
+								{{timeout}}
+							{{else}}
+								{{moment (add ../dates timeout) 'hh:mm:ss A'}}
+							{{/equal}}
+						{{/equal}}
+					{{/each}}
+				</p>
+	{{#each log.status}}
+		{{#equal (addOne @index) ../log.status.length}}
+			{{#equal status 'Present'}}
+				<p id="status" class="waves-effect waves-light btn-large col m12 blue" style="margin-top: -10px;">Present</p>
+			{{/equal}}
+			{{#equal status 'Late'}}
+				<p id="status" class="waves-effect waves-light btn-large col m12 orange" style="margin-top: -10px;">Late</p>
+			{{/equal}}
+			{{#equal status 'Sick'}}
+				<p id="status" class="waves-effect waves-light btn-large col m12 green" style="margin-top: -10px;">Sick</p>
+			{{/equal}}
+			{{#equal status 'Vacation'}}
+				<p id="status" class="waves-effect waves-light btn-large col m12 red" style="margin-top: -10px;">Vacation</p>
+			{{/equal}}
+			{{#equal status 'Absent'}}
+				<p id="status" class="waves-effect waves-light btn-large col m12 grey" style="margin-top: -10px;">Absent</p>
+			{{/equal}}
+		{{/equal}}
+	{{/each}}
+			</div>
+		</div>
+	</div>
+	<div class="col m5 right">
+		<div id="in_out">
+		{{#greater log.timein.length log.timeout.length}}
+			<form method="post" action="/{{team.team}}/{{user_id}}/timeout/{{dates}}/{{time}}">
+				<button type="submit" id="tout" class="waves-effect waves-light btn-large col m12 red darken-1">Time Out</button>
+		{{else}}
+			<form id="timein" method="post" action="/{{team.team}}/{{user_id}}/timein/{{dates}}/{{time}}">
+				<button type="submit" id="tin" class="waves-effect waves-light btn-large col m12 blue blue darken-1">Time In</button>
+		{{/greater}}
+				<div class="form-group">
+					<input class="form-control" type="hidden" name="dates" value="{{dates}}">
+					<input id="time" class="form-control" type="hidden" name="time">
+					<input id="last_date" class="form-control" type="hidden" name="last_date">
+					<input class="form-control" type="hidden" name="sched_in" value="{{team.sched_in}}:00">
+					<input class="form-control" type="hidden" name="sched_out" value="{{team.sched_out}}:00">
+				</div>
+			</form>
+		</div>
+		<div id="sick_leave">
+		{{#equal log.timein.length log.timeout.length}}
+			<form method="post" action="/{{team.team}}/{{user_id}}/status/{{dates}}/">
+				<button type="submit" id="sick" class="waves-effect waves-light btn col m12">Sick Leave</button>
+			</form>
+		{{/equal}}
+		</div>
+		<div class="leave">
+			<button id="leave" data-target="vacation" class="waves-effect waves-light btn col m12">Vacation Leave</button>
+			<div id="vacation" class="modal modal-fixed-footer">
+				<form method="post" action="/{{team.team}}/{{user_id}}/leave/form/{{dates}}/">
+					<div class="modal-content">
+						<h3>Leave Form</h3>
+						<div class="form-group">
+							<label>Date: </label>
+							<input id="datepicker" class="form-control" type="text" name="leave" placeholder="Leave Date MM-DD-YYYY">
+						</div>
+						<div class="form-group">
+							<label>Message: </label>
+							<textarea id="message" name="message" class="form-control" type="text"></textarea>
+						</div>
+					</div>
+					<div class="modal-footer">
+							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Submit</button>
+							<a type="button" id="request" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="History" class="col s12">{{team.sched_out}}
+	<form method="post" action="/{{team.team}}/{{user_id}}/filter" class="row">
+		<div class="form-group col s3">
+			<select name="filterMonth">
+				<option value="{{moment dates 'MM'}}" selected>Select Month</option>
+				<option value="01">January</option>
+				<option value="02">Febuary</option>
+				<option value="03">March</option>
+				<option value="04">April</option>
+				<option value="05">May</option>
+				<option value="06">June</option>
+				<option value="07">July</option>
+				<option value="08">August</option>
+				<option value="09">September</option>
+				<option value="10">October</option>
+				<option value="11">November</option>
+				<option value="12">December</option>
+			</select>
+		</div>
+		<div class="form-group col s3">
+			<select name="filterStatus">
+				<option value="all" selected>Select Status</option>
+				<option value="Present">Present</option>
+				<option value="Late">Late</option>
+				<option value="Sick">Sick</option>
+				<option value="Leave">Leave</option>
+			</select>
+		</div>
+		<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col">Filter</button>
+	</form>
+	<table class="responsive-table striped col m12">
+		<tr>
+			<th>Date</th>
+			<th>Time In</th>
+			<th>Time Out</th>
+			<th>Status</th>
+			<th>Status Out</th>
+		</tr>
+		{{#each logs}}
+			{{#each status}}
+				{{#equal ../../filterMonth (moment ../../dates 'MM')}}
+					{{#equal ../../filterStatus 'all'}}
+						<tr>
+							<td>
+								{{moment ../date 'MMM DD YYYY'}}
+							</td>
+							<td>
+								{{#each ../timein}}
+									{{#equal @../index @index}}
+										{{#equal timein 'N/A'}}
+											{{timein}}
+										{{else}}
+											{{moment (add ../../date timein) 'hh:mm:ss A'}}
+										{{/equal}}
+									{{/equal}}
+								{{/each}}
+							</td>
+							<td>
+								{{#each ../timeout}}
+									{{#equal @../index @index}}
+										{{#equal timeout 'N/A'}}
+											{{timeout}}
+										{{else}}
+											{{moment (add ../../date timeout) 'hh:mm:ss A'}}
+										{{/equal}}
+									{{/equal}}
+								{{/each}}
+							</td>
+							<td>
+								{{status}}
+							</td>
+							<td>
+								{{#each ../timeout}}
+									{{#equal @../index @index}}
+										{{#equal timeout 'N/A'}}
+										{{else}}
+											{{#greater timeout ../../../team.sched_out}}
+												Over Time
+											{{else}}
+												Under Time
+											{{/greater}}
+										{{/equal}}
+									{{/equal}}
+								{{/each}}
+							</td>
+						</tr>
+					{{else}}
+						{{#equal ../../filterStatus status}}
+							<tr>
+								<td>
+									{{moment ../date 'MMM DD YYYY'}}
+								</td>
+								<td>
+									{{#each ../timein}}
+										{{#equal @../index @index}}
+											{{#equal timein 'N/A'}}
+												{{timein}}
+											{{else}}
+												{{moment (add ../../date timein) 'hh:mm:ss A'}}
+											{{/equal}}
+										{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{#each ../timeout}}
+										{{#equal @../index @index}}
+											{{#equal timeout 'N/A'}}
+												{{timeout}}
+											{{else}}
+												{{moment (add ../../date timeout) 'hh:mm:ss A'}}
+											{{/equal}}
+										{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{status}}
+								</td>
+								<td>
+									{{#each ../timeout}}
+										{{#equal @../index @index}}
+											{{#equal timeout 'N/A'}}
+											{{else}}{{../../../../time.sched_out}}
+												{{#greater timeout ../../../../time.sched_out}}
+													Over Time
+												{{/greater}}
+											{{/equal}}
+										{{/equal}}
+									{{/each}}
+								</td>
+							</tr>
+						{{/equal}}
+					{{/equal}}
+				{{/equal}}
+			{{/each}}
+		{{/each}}
+	</table>
+</div>
+
+<div id="Form" class="col s12">
+	<table class="col m12">
+		<tr>
+			<th>Date Requested</th>
+			<th>Leave Request</th>
+			<th>Status</th>
+			<th></th>
+		</tr>
+		{{#each forms}}
+		<tr>
+			<td>{{moment date 'MMM DD, YYYY'}}</td>
+			<td>{{moment leave_date 'MMM DD, YYYY'}}</td>
+			<td>{{leave_status}}</td>
+			<td>
+				<button class="btn red waves-effect waves-light delete-form" data-target="form{{_id}}">Cancel</button>
+				<div id="form{{_id}}" class="modal">
+				<form method="post" action="/{{../team.team}}/{{../user_id}}/leave/form/delete/{{_id}}">
+					<div class="modal-content center-align">
+						<h6>Do you want to cancel this form?</h6>
+					</div>
+					<div class="modal-footer">
+							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
+							<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					</div>
+				</form>
+				</div>
+			</td>
+		</tr>
+		{{/each}}
+	</table>
+</div>
+<div id="Settings" class="col s12">
+<div class="row">
+<h3> Update a User </h3>
+	<div class="col s10 offset-s1">
+		<form method="post" action="/{{team.team}}/{{user_id}}">
+			<div class="col s6">
+				<div class="form-group">
+					<label> First Name: </label>
+					<input class="form-control" type="text" name="fname" placeholder="First Name" value="{{user.first_name}}">
+				</div>
+				<div class="form-group">
+					<label> Last Name: </label>
+					<input class="form-control" type="text" name="lname" placeholder=" Last Name" value="{{user.last_name}}">
+				</div>
+				<div class="form-group">
+					<label> Email: </label>
+					<input class="form-control" type="email" name="email" placeholder="Email" value="{{user.email}}">
+				</div>
+				<div class="form-group">
+					<label> Picture: </label>
+					<input class="form-control" type="text" name="image" placeholder="Image Link" value="{{user.img}}">
+				</div>
+			</div>
+			<div class="col s6">
+				<div class="form-group">
+					<label> Username: </label>
+					<input class="form-control" type="text" name="username" placeholder="Username" value="{{user.username}}">
+				</div>
+				<div>
+					<label>New Password</label>
+					<div class="form-group">
+						<label> Password: </label>
+						<input class="form-control" type="password" name="password" placeholder="Password">
+					</div>
+					<div class="form-group">
+						<label> Confirm Password: </label>
+						<input class="form-control" type="password" name="password2" placeholder="Confirm Password">
+					</div>
+				</div>
+			</div>
+			<input type="hidden" name="team" value="{{user.team}}">
+			<input type="hidden" name="position" value="{{user.position}}">
+			<div class="col s12 center">
+				<button type="submit" class="waves-effect waves-light btn col s12">Update</button>
+			</div>
+		</form>
+	</div>
+</div>
+</div>
+</div>

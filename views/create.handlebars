@@ -1,0 +1,48 @@
+
+<div class="row">
+<h3> Create a User </h3>
+	<div class="col s10 offset-s1">
+		<form method="post" action="/{{team.team}}/{{user_id}}/create">
+			<div class="col s6">
+				<div class="form-group">
+					<label> First Name: </label>
+					<input class="form-control" type="text" name="fname" placeholder="First Name" autofocus>
+				</div>
+				<div class="form-group">
+					<label> Last Name: </label>
+					<input class="form-control" type="text" name="lname" placeholder=" Last Name">
+				</div>
+				<div class="form-group">
+					<label> Email: </label>
+					<input class="form-control" type="email" name="email" placeholder="Email">
+				</div>
+				<div class="form-group">
+					<label> Position: </label>
+					<select class="form-control" type="text" name="position">
+						<option value="Manager">Manager</option>
+						<option value="User" selected>User</option>
+					</select>
+				</div>
+			</div>
+			<div class="col s6">
+				<div class="form-group">
+					<label> Username: </label>
+					<input class="form-control" type="text" name="username" placeholder="Username">
+				</div>
+				<div class="form-group">
+					<label> Password: </label>
+					<input class="form-control" type="password" name="password" placeholder="Password">
+				</div>
+				<div class="form-group">
+					<label> Confirm Password: </label>
+					<input class="form-control" type="password" name="password2" placeholder="Confirm Password">
+				</div>
+			</div>
+			<input type="hidden" name="team" value="{{user.team}}">
+			<div class="col s12 center">
+				<button type="submit" class="waves-effect waves-light btn col s12">Create</button>
+			</div>
+		</form>
+	</div>
+</div>
+<br><br>
