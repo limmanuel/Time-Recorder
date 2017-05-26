@@ -125,4 +125,41 @@
 		</div>
 	</div>
 </div>
+<div class="row">
+<h3>Holidays</h3>
+	<table>
+		<tr>
+			<th>Holiday</th>
+			<th>Date</th>
+			<th></th>
+		</tr>
+		{{#each team.holiday}}
+			<tr>
+				<td>{{name}}</td>
+				<td>{{date}}</td>
+				<td>asdasd</td>
+			</tr>
+		{{/each}}
+	</table>
+	<button class="waves-effect waves-light btn-flat col s12" data-target="Add_Holiday">Add Holiday</button>
+	<div id="Add_Holiday" class="modal">
+		<form method="post" action="/{{team.team}}/{{user_id}}/admin/settings/add">
+			<div class="modal-content">
+				<div class="form-group col s6">
+					<label> Holiday: </label>
+					<input class="form-control" type="text" name="holiday_name" placeholder="Holiday Name">
+				</div>
+				<div class="form-group col s6">
+					<label>Date: </label>
+					<input id="datepicker" class="form-control" type="text" name="holiday_date" placeholder="Select Date MM-DD-YYYY">
+				</div>
+				<div><br><br><br><br><br><br><br><br><br><br><br><br></div>
+			</div>
+			<div class="modal-footer">
+					<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
+					<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+			</div>
+		</form>
+	</div>
+</div>
 </div>

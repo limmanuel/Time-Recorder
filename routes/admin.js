@@ -64,7 +64,8 @@ router.post('/register', function(req,res,next){
 			var newAccount = new Account({
 				team: team,
 				sched_in: sched_in,
-				sched_out: sched_out
+				sched_out: sched_out,
+				holiday: []
 			});
 			Account.registerAccount(newAccount, function(err, account){
 				if(err){
@@ -85,6 +86,7 @@ router.post('/register', function(req,res,next){
 						date: moment().format('MM-DD-YYYY'),
 						team: team,
 						user_id: user._id,
+						name: first_name + ' ' + last_name,
 						timein: [],
 						timeout: [],
 						status: []
@@ -115,13 +117,15 @@ router.get('/login', function(req,res,next){
 	Account.getAccounts(function(err, accounts){
 		accounts.forEach(function(account){
 			if(account !== null && account!== undefined){
-				var team = account.team; console.log(team);
+				var team = account.team;
 				Wuser.getUsersByTeam(team,function(err, users){
 					users.forEach(function(user){
 						if(user !== null && user!== undefined){
 							var userid = user._id;
+							var name = user.first_name+' '+user.last_name;
 							Time.getTimeLogsByUser(userid, function(err, logs){
 								var l = 0;
+								var date_now = moment().format('MM-DD-YYYY');
 								logs.forEach(function(log){
 									if(log.date == moment().format('MM-DD-YYYY')){
 										l=1;
@@ -129,9 +133,10 @@ router.get('/login', function(req,res,next){
 								});
 								if(l == 0){
 									var newLog = new Time ({
-										date: moment().format('MM-DD-YYYY'),
+										date: date_now,
 										team: team,
 										user_id: userid,
+										name: name,
 										timein: [],
 										timeout: [],
 										status: []
@@ -146,6 +151,23 @@ router.get('/login', function(req,res,next){
 										}
 										console.log(user.first_name);
 										Time.addStatus(query, status, function(err, data){});
+									});
+								}
+								var sched = account.sched_out+':00';
+								var time = moment().format('HH:MM:ss');
+								if(time >= sched){
+									Time.getTimeLogsByUserAndDate(userid, moment().format('MM-DD-YYYY'), function(err, user){
+										let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': "Absent"};
+										var timein = {
+											timein: "N/A",
+											date: moment().format('MM-DD-YYYY')
+										}
+										var timeout = {
+											timeout: "N/A",
+											date: moment().format('MM-DD-YYYY')
+										}
+										Time.addTimeIn(query, timein, function(err, tin){});
+										Time.addTimeOut(query, timeout, function(err, tout){});
 									});
 								}
 							});
@@ -247,10 +269,18 @@ router.get('/logout', function(req,res,next){
 router.get('/:team/:id',ensureAuthenticated, function (req,res,next){
 	if(req.query.month){
 		var filterMonth = req.query.month;
-		var filterStatus = req.query.status;
+		if(req.query.status){
+			var filterStatus = req.query.status.split(',');
+		} else {
+			var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+		}
 	} else {
 		var filterMonth = moment().format('MM');
-		var filterStatus = "all";
+		if(req.query.status){
+			var filterStatus = req.query.status.split(',');
+		} else {
+			var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+		}
 	}
 	 if(req.query.tab) {
 		var tab = req.query.tab;
@@ -359,16 +389,13 @@ router.post('/:team/:id/status/:dates', ensureAuthenticated,  function(req,res,n
 		let query = {user_id: req.params.id, date: req.params.dates};
 		let status_query = {user_id: req.params.id, date: req.params.dates};
 		var status = {
-			status: "Sick",
-			date: moment().format('MM-DD-YYYY')
+			status: "Sick"
 		}
 		var timein = {
-			timein: "N/A",
-			date: moment().format('MM-DD-YYYY')
+			timein: "N/A"
 		}
 		var timeout = {
-			timeout: "N/A",
-			date: moment().format('MM-DD-YYYY')
+			timeout: "N/A"
 		}
 		Time.addTimeIn(query, timein, function(err, tin){});
 		Time.addTimeOut(query, timeout, function(err, tout){});
@@ -407,7 +434,17 @@ router.post('/:team/:id/leave/form/:dates', ensureAuthenticated, function(req,re
 //History Tab
 //Filter
 router.post('/:team/:id/filter', ensureAuthenticated, function(req,res,next){
-	res.redirect('/'+req.params.team+'/'+req.params.id+'/?tab=history&month='+req.body.filterMonth+'&status='+req.body.filterStatus);
+	if(req.body.filterMonth){
+		if (req.body.filterStatus){
+			res.redirect('/'+req.params.team+'/'+req.params.id+'/?tab=history&month='+req.body.filterMonth+'&status='+req.body.filterStatus);
+		} else {
+			res.redirect('/'+req.params.team+'/'+req.params.id+'/?tab=history&month='+req.body.filterMonth);
+		}
+	} else if(req.body.filterStatus){
+		res.redirect('/'+req.params.team+'/'+req.params.id+'/?tab=history&status='+req.body.filterStatus);
+	} else {
+		res.redirect('/'+req.params.team+'/'+req.params.id+'/?tab=history');
+	}
 });
 
 //Form Tab
@@ -445,10 +482,18 @@ router.post('/:team/:id', ensureAuthenticated, function(req,res,next){
 	if(errors){
 		if(req.query.month){
 			var filterMonth = req.query.month;
-			var filterStatus = req.query.status;
+			if(req.query.status){
+				var filterStatus = req.query.status.split(',');
+			} else {
+				var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+			}
 		} else {
 			var filterMonth = moment().format('MM');
-			var filterStatus = "all";
+			if(req.query.status){
+				var filterStatus = req.query.status.split(',');
+			} else {
+				var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+			}
 		}
 		 if(req.query.tab) {
 			var tab = req.query.tab;
@@ -518,11 +563,20 @@ router.post('/:team/:id', ensureAuthenticated, function(req,res,next){
 router.get('/:team/:id/dashboard', ensureAuthenticated, function (req,res,next){
 	if(req.query.month){
 		var filterMonth = req.query.month;
-		var filterStatus = req.query.status;
+		if(req.query.status){
+			var filterStatus = req.query.status.split(',');
+		} else {
+			var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+		}
 	} else {
 		var filterMonth = moment().format('MM');
-		var filterStatus = "all";
-	} if(req.query.tab) {
+		if(req.query.status){
+			var filterStatus = req.query.status.split(',');
+		} else {
+			var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+		}
+	}
+	 if(req.query.tab) {
 		var tab = req.query.tab;
 	} else {
 		var tab = 'home';
@@ -561,7 +615,17 @@ router.get('/:team/:id/dashboard', ensureAuthenticated, function (req,res,next){
 //History Tab
 //Filter
 router.post('/:team/:id/dashboard/filter', ensureAuthenticated,  function(req,res,next){
-	res.redirect('/'+req.params.team+'/'+req.params.id+'/dashboard/?tab=history&month='+req.body.filterMonth+'&status='+req.body.filterStatus);
+	if(req.body.filterMonth){
+		if (req.body.filterStatus){
+			res.redirect('/'+req.params.team+'/'+req.params.id+'/dashboard/?tab=history&month='+req.body.filterMonth+'&status='+req.body.filterStatus);
+		} else {
+			res.redirect('/'+req.params.team+'/'+req.params.id+'/dashboard/?tab=history&month='+req.body.filterMonth);
+		}
+	} else if(req.body.filterStatus){
+		res.redirect('/'+req.params.team+'/'+req.params.id+'/dashboard/?tab=history&status='+req.body.filterStatus);
+	} else {
+		res.redirect('/'+req.params.team+'/'+req.params.id+'/dashboard/?tab=history');
+	}
 });
 
 //Form Tab
@@ -680,6 +744,18 @@ router.post('/:team/:id/admin/settings/update/:user_id', ensureAuthenticated, fu
 	}
 });
 
+//Delete User
+router.post('/:team/:id/admin/settings/delete/:user_id', ensureAuthenticated, function(req,res,next){
+	let log_query = {user_id: req.params.user_id};
+	let user_query = {_id: req.params.user_id};
+	Time.deleteUser(log_query, function(err, val){});
+	Request.deleteUser(log_query, function(err, response){});
+	Wuser.deleteUser(user_query, function(err, data){
+		if(err){return console.log(err);}
+			res.redirect('/'+req.params.team+'/'+req.params.id+'/admin/?tab=User');
+	});
+});
+
 //Account Settings
 //Update
 router.post('/:team/:id/admin/settings/update/', ensureAuthenticated, function (req,res,next){
@@ -746,17 +822,43 @@ router.post('/:team/:id/admin/settings/update/', ensureAuthenticated, function (
 	}); 
 });
 
-//Delete User
-router.post('/:team/:id/admin/settings/delete/:user_id', ensureAuthenticated, function(req,res,next){
-	let log_query = {user_id: req.params.user_id};
-	let user_query = {_id: req.params.user_id};
-	Time.deleteUser(log_query, function(err, val){});
-	Request.deleteUser(log_query, function(err, response){});
-	Wuser.deleteUser(user_query, function(err, data){
-		if(err){return console.log(err);}
-			res.redirect('/'+req.params.team+'/'+req.params.id+'/admin/?tab=User');
+//Add Holidays
+router.post('/:team/:id/admin/settings/add', ensureAuthenticated,  function(req,res,next){
+	var query = {team: req.params.team};
+	holiday_date = moment(req.body.holiday_date).format('MM-DD-YYYY')
+	var holiday = {
+		name: req.body.holiday_name,
+		date: holiday_date
+	}
+	Wuser.getUsersByTeam(req.params.team, function(err, users){
+		users.forEach(function(user){
+			var newLog = new Time ({
+				date: holiday_date,
+				team: req.params.team,
+				user_id: user._id,
+				name: user.first_name + ' ' + user.last_name,
+				status: {
+				status: "Holiday"
+				},
+				timein: {
+					timein: "N/A"
+				},
+				timeout: {
+					timeout: "N/A"
+				}
+			});
+			newLog.save(function(err){
+				if(err){
+					console.log(err);
+				}
+			});
+		});
+		Account.addHoliday(query, holiday, function(err, holiday){
+			res.redirect('/'+req.params.team+'/'+req.params.id+'/admin/?tab=Account');
+		});
 	});
 });
+
 
 //------------------------Create User----------------------------
 //Create Page
@@ -826,6 +928,7 @@ router.post('/:team/:id/create', ensureAuthenticated, function(req,res,next){
 				date: moment().format('MM-DD-YYYY'),
 				team: team,
 				user_id: user._id,
+				name: first_name + ' ' + last_name,
 				timein: [],
 				timeout: [],
 				status: []
@@ -848,8 +951,6 @@ router.post('/:team/:id/create', ensureAuthenticated, function(req,res,next){
 		});
 	}
 });
-
-
 
 //Authentication
 function ensureAuthenticated(req,res,next){

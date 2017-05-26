@@ -11,7 +11,15 @@ var accountSchema = mongoose.Schema({
 	},
 	sched_out: {
 		type: String
-	}
+	},
+	holiday: [{
+		name: {
+			type: String
+		},
+		date: {
+			type: String
+		}
+	}]
 });
 
 var Account = module.exports = mongoose.model('Account', accountSchema);
@@ -35,4 +43,14 @@ module.exports.getAccounts = function(callback){
 
 module.exports.updateAccount = function(query, account, callback){
 	Account.update(query,{$set: account},callback);
+}
+
+module.exports.addHoliday = function(query, holiday, callback){
+	Account.update(query,
+	{
+		$push:{
+			holiday: holiday
+		}
+	},
+	 callback);
 }

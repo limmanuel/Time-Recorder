@@ -11,6 +11,9 @@ var timelogSchema = new mongoose.Schema({
 	user_id: {
 		type: String
 	},
+	name: {
+		type: String
+	},
 	timein: [{
 		timein: {
 			type: String

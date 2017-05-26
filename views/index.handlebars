@@ -1,14 +1,12 @@
 
 <div class="row">
-<div id="Home" class="col s12">
-	<div class="col m4" style="width:300px;">
-		<div class="grey darken-3" style="border-radius: 5px;">
-			<a class="waves-effect waves-light tooltipped" data-position="left" data-delay="50" data-tooltip="Change your profile picture" data-target="img" href="#">
-				<div style="padding:10px; overflow:hidden">
-					<img src="{{user.img}}" alt="profile" border="0" width="100%">
-				</div>
-			</a>
-			<div id="img" class="modal">
+<div id="Home" class="col s12 row">
+	<div class="col xl8 l12">
+		<div class="grey darken-3 card horizontal profile">
+			<div class="card-image waves-effect waves-light tooltipped" data-position="left" data-delay="50" data-tooltip="Change your profile picture" data-target="img" style="border-radius: 7px; width: 240px; height: 240px; overflow:hidden">
+				<img src="{{user.img}}">
+			</div>
+			<div id="img" class="modal ">
 				<form method="post" action="/{{team.team}}/{{user_id}}/image">
 					<div class="modal-content">
 						<div style="height: 200px; width: 200px; overflow:hidden">
@@ -23,64 +21,64 @@
 					</div>
 				</form>
 			</div>
-			<div class="row">
-				<p class="col waves-effect waves-light s12 cyan float" style="margin-top: -25px;">
-					<b>Name:</b> {{user.first_name}} {{user.last_name}}<br>
-					<b>Email:</b> {{user.email}} <br>
-					<b>Position:</b> {{user.position}}
-				</p>
-				<p class="col m12 waves-effect waves-light blue" style="margin-top: -15px;">
-					<b>Time In: </b>
-					{{#each log.timein}}
-						{{#equal (addOne @index) ../log.timein.length}}
-							{{#equal timein 'N/A'}}
-								{{timein}}
-							{{else}}
-								{{moment (add ../dates timein) 'hh:mm:ss A'}}
+			<div class="card-stacked col" style="padding: 10px 0px 10px 5px">
+					<p class="col waves-effect waves-light s12 cyan float" >
+						<b>Name:</b> {{user.first_name}} {{user.last_name}}<br>
+						<b>Email:</b> {{user.email}} <br>
+						<b>Position:</b> {{user.position}}
+					</p>
+					<p class="col m12 waves-effect waves-light blue" style="margin-top: -15px;">
+						<b>Time In: </b>
+						{{#each log.timein}}
+							{{#equal (addOne @index) ../log.timein.length}}
+								{{#equal timein 'N/A'}}
+									{{timein}}
+								{{else}}
+									{{moment (add ../dates timein) 'hh:mm:ss A'}}
+								{{/equal}}
 							{{/equal}}
-						{{/equal}}
-					{{/each}}<br>
-					<b>Time Out: </b>
-					{{#each log.timeout}}
-						{{#equal (addOne @index) ../log.timein.length}}
-							{{#equal timeout 'N/A'}}
-								{{timeout}}
-							{{else}}
-								{{moment (add ../dates timeout) 'hh:mm:ss A'}}
+						{{/each}}<br>
+						<b>Time Out: </b>
+						{{#each log.timeout}}
+							{{#equal (addOne @index) ../log.timein.length}}
+								{{#equal timeout 'N/A'}}
+									{{timeout}}
+								{{else}}
+									{{moment (add ../dates timeout) 'hh:mm:ss A'}}
+								{{/equal}}
 							{{/equal}}
-						{{/equal}}
-					{{/each}}
-				</p>
-	{{#each log.status}}
-		{{#equal (addOne @index) ../log.status.length}}
-			{{#equal status 'Present'}}
-				<p id="status" class="waves-effect waves-light btn-large col m12 blue" style="margin-top: -10px;">Present</p>
+						{{/each}}
+					</p>
+		{{#each log.status}}
+			{{#equal (addOne @index) ../log.status.length}}
+				{{#equal status 'Present'}}
+					<p id="status" class="waves-effect waves-light btn-large col m12 blue" style="margin-top: -10px;">Present</p>
+				{{/equal}}
+				{{#equal status 'Late'}}
+					<p id="status" class="waves-effect waves-light btn-large col m12 orange" style="margin-top: -10px;">Late</p>
+				{{/equal}}
+				{{#equal status 'Sick'}}
+					<p id="status" class="waves-effect waves-light btn-large col m12 green" style="margin-top: -10px;">Sick</p>
+				{{/equal}}
+				{{#equal status 'Vacation'}}
+					<p id="status" class="waves-effect waves-light btn-large col m12 red" style="margin-top: -10px;">Vacation</p>
+				{{/equal}}
+				{{#equal status 'Absent'}}
+					<p id="status" class="waves-effect waves-light btn-large col m12 grey" style="margin-top: -10px;">Absent</p>
+				{{/equal}}
 			{{/equal}}
-			{{#equal status 'Late'}}
-				<p id="status" class="waves-effect waves-light btn-large col m12 orange" style="margin-top: -10px;">Late</p>
-			{{/equal}}
-			{{#equal status 'Sick'}}
-				<p id="status" class="waves-effect waves-light btn-large col m12 green" style="margin-top: -10px;">Sick</p>
-			{{/equal}}
-			{{#equal status 'Vacation'}}
-				<p id="status" class="waves-effect waves-light btn-large col m12 red" style="margin-top: -10px;">Vacation</p>
-			{{/equal}}
-			{{#equal status 'Absent'}}
-				<p id="status" class="waves-effect waves-light btn-large col m12 grey" style="margin-top: -10px;">Absent</p>
-			{{/equal}}
-		{{/equal}}
-	{{/each}}
+		{{/each}}
 			</div>
 		</div>
 	</div>
-	<div class="col m5 right">
+	<div class="col xl4 s6 offset-s3"><br><br>
 		<div id="in_out">
 		{{#greater log.timein.length log.timeout.length}}
 			<form method="post" action="/{{team.team}}/{{user_id}}/timeout/{{dates}}/{{time}}">
-				<button type="submit" id="tout" class="waves-effect waves-light btn-large col m12 red darken-1">Time Out</button>
+				<button type="submit" id="tout" class="waves-effect waves-light btn-large col s12 red darken-1">Time Out</button>
 		{{else}}
 			<form id="timein" method="post" action="/{{team.team}}/{{user_id}}/timein/{{dates}}/{{time}}">
-				<button type="submit" id="tin" class="waves-effect waves-light btn-large col m12 blue blue darken-1">Time In</button>
+				<button type="submit" id="tin" class="waves-effect waves-light btn-large col s12 blue blue darken-1">Time In</button>
 		{{/greater}}
 				<div class="form-group">
 					<input class="form-control" type="hidden" name="dates" value="{{dates}}">
@@ -94,12 +92,12 @@
 		<div id="sick_leave">
 		{{#equal log.timein.length log.timeout.length}}
 			<form method="post" action="/{{team.team}}/{{user_id}}/status/{{dates}}/">
-				<button type="submit" id="sick" class="waves-effect waves-light btn col m12">Sick Leave</button>
+				<button type="submit" id="sick" class="waves-effect waves-light btn col s12">Sick Leave</button>
 			</form>
 		{{/equal}}
 		</div>
 		<div class="leave">
-			<button id="leave" data-target="vacation" class="waves-effect waves-light btn col m12">Vacation Leave</button>
+			<button id="leave" data-target="vacation" class="waves-effect waves-light btn col s12">Vacation Leave</button>
 			<div id="vacation" class="modal modal-fixed-footer">
 				<form method="post" action="/{{team.team}}/{{user_id}}/leave/form/{{dates}}/">
 					<div class="modal-content">
@@ -114,8 +112,8 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Submit</button>
-							<a type="button" id="request" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+							<button type="submit" class="waves-effect waves-light btn col s6 modal-action modal-close">Submit</button>
+							<a type="button" id="request" href="#!" class="waves-effect waves-light btn col s6 red modal-close">Cancel</a>
 					</div>
 				</form>
 			</div>
@@ -123,11 +121,11 @@
 	</div>
 </div>
 
-<div id="History" class="col s12">{{team.sched_out}}
+<div id="History" class="col s12">
 	<form method="post" action="/{{team.team}}/{{user_id}}/filter" class="row">
-		<div class="form-group col s3">
+		<div class="form-group col m3 s5">
 			<select name="filterMonth">
-				<option value="{{moment dates 'MM'}}" selected>Select Month</option>
+				<option disabled selected>Select Month</option>
 				<option value="01">January</option>
 				<option value="02">Febuary</option>
 				<option value="03">March</option>
@@ -142,16 +140,17 @@
 				<option value="12">December</option>
 			</select>
 		</div>
-		<div class="form-group col s3">
-			<select name="filterStatus">
-				<option value="all" selected>Select Status</option>
+		<div class="form-group col m3 s5">
+			<select multiple name="filterStatus">
+				<option disabled selected>Select Status</option>
 				<option value="Present">Present</option>
 				<option value="Late">Late</option>
 				<option value="Sick">Sick</option>
-				<option value="Leave">Leave</option>
+				<option value="Vacation">Vacation</option>
+				<option value="Holiday">Holiday</option>
 			</select>
 		</div>
-		<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col">Filter</button>
+		<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col l2 m3 s2">Filter</button>
 	</form>
 	<table class="responsive-table striped col m12">
 		<tr>
@@ -159,102 +158,44 @@
 			<th>Time In</th>
 			<th>Time Out</th>
 			<th>Status</th>
-			<th>Status Out</th>
 		</tr>
 		{{#each logs}}
 			{{#each status}}
-				{{#equal ../../filterMonth (moment ../../dates 'MM')}}
-					{{#equal ../../filterStatus 'all'}}
-						<tr>
-							<td>
-								{{moment ../date 'MMM DD YYYY'}}
-							</td>
-							<td>
-								{{#each ../timein}}
-									{{#equal @../index @index}}
-										{{#equal timein 'N/A'}}
-											{{timein}}
-										{{else}}
-											{{moment (add ../../date timein) 'hh:mm:ss A'}}
-										{{/equal}}
-									{{/equal}}
-								{{/each}}
-							</td>
-							<td>
-								{{#each ../timeout}}
-									{{#equal @../index @index}}
-										{{#equal timeout 'N/A'}}
-											{{timeout}}
-										{{else}}
-											{{moment (add ../../date timeout) 'hh:mm:ss A'}}
-										{{/equal}}
-									{{/equal}}
-								{{/each}}
-							</td>
-							<td>
-								{{status}}
-							</td>
-							<td>
-								{{#each ../timeout}}
-									{{#equal @../index @index}}
-										{{#equal timeout 'N/A'}}
-										{{else}}
-											{{#greater timeout ../../../team.sched_out}}
-												Over Time
-											{{else}}
-												Under Time
-											{{/greater}}
-										{{/equal}}
-									{{/equal}}
-								{{/each}}
-							</td>
-						</tr>
-					{{else}}
-						{{#equal ../../filterStatus status}}
+				{{#equal ../../filterMonth (moment ../date 'MM')}}
+					{{#each ../../filterStatus}}
+						{{#equal this ../status}}
 							<tr>
 								<td>
-									{{moment ../date 'MMM DD YYYY'}}
+									{{moment ../../date 'MMM DD YYYY'}}
 								</td>
 								<td>
-									{{#each ../timein}}
-										{{#equal @../index @index}}
+									{{#each ../../timein}}
+										{{#equal @../../index @index}}
 											{{#equal timein 'N/A'}}
 												{{timein}}
 											{{else}}
-												{{moment (add ../../date timein) 'hh:mm:ss A'}}
+												{{moment (add ../../../date timein) 'hh:mm:ss A'}}
 											{{/equal}}
 										{{/equal}}
 									{{/each}}
 								</td>
 								<td>
-									{{#each ../timeout}}
-										{{#equal @../index @index}}
+									{{#each ../../timeout}}
+										{{#equal @../../index @index}}
 											{{#equal timeout 'N/A'}}
 												{{timeout}}
 											{{else}}
-												{{moment (add ../../date timeout) 'hh:mm:ss A'}}
+												{{moment (add ../../../date timeout) 'hh:mm:ss A'}}
 											{{/equal}}
 										{{/equal}}
 									{{/each}}
 								</td>
 								<td>
-									{{status}}
-								</td>
-								<td>
-									{{#each ../timeout}}
-										{{#equal @../index @index}}
-											{{#equal timeout 'N/A'}}
-											{{else}}{{../../../../time.sched_out}}
-												{{#greater timeout ../../../../time.sched_out}}
-													Over Time
-												{{/greater}}
-											{{/equal}}
-										{{/equal}}
-									{{/each}}
+									{{../status}}
 								</td>
 							</tr>
 						{{/equal}}
-					{{/equal}}
+					{{/each}}
 				{{/equal}}
 			{{/each}}
 		{{/each}}

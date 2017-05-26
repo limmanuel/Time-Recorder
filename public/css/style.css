@@ -4,7 +4,7 @@ p {
 	margin-top: 5px;
 	font-size: 18px;
 }p.dashboard {
-	color: grey;
+	color: white !important; 
   border-bottom-right-radius: 5px;
   border-top-right-radius: 5px;
   border-bottom-left-radius: 0px;
@@ -29,6 +29,17 @@ p {
   width: 100%;
   height: 100px;
   border-radius: 10px;
+}.profile {
+  width: 600px;
+  height: 250px;
+  border-radius: 10px;
+  padding: 5px;
+}.profiles {
+  width: 600px;
+  height: 250px;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: 0 0 0px #222;
 } .info {
   padding:0px 10px 0px 10px;
   width: 95%;
