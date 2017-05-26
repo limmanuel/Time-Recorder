@@ -54,3 +54,7 @@ module.exports.addHoliday = function(query, holiday, callback){
 	},
 	 callback);
 }
+
+module.exports.delHoliday = function(query, id, callback){
+	Account.update(query,{$pull:{holiday:{ _id: id}}},callback);
+}

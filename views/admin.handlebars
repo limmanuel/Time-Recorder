@@ -136,14 +136,27 @@
 		{{#each team.holiday}}
 			<tr>
 				<td>{{name}}</td>
-				<td>{{date}}</td>
-				<td>asdasd</td>
+				<td>{{moment date 'MMM DD YYYY'}}</td>
+				<td>
+					<button class="btn red waves-effect waves-light delete-form" data-target="holiday{{_id}}">Delete</button>
+					<div id="holiday{{_id}}" class="modal">
+					<form method="post" action="/{{../team.team}}/{{../user_id}}/admin/settings/delete/holiday/{{_id}}">
+						<div class="modal-content center-align">
+							<h6>Do you want to cancel this form?</h6>
+						</div>
+						<div class="modal-footer">
+								<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
+								<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+						</div>
+					</form>
+					</div>
+				</td>
 			</tr>
 		{{/each}}
 	</table>
 	<button class="waves-effect waves-light btn-flat col s12" data-target="Add_Holiday">Add Holiday</button>
 	<div id="Add_Holiday" class="modal">
-		<form method="post" action="/{{team.team}}/{{user_id}}/admin/settings/add">
+		<form method="post" action="/{{team.team}}/{{user_id}}/admin/settings/holiday/add">
 			<div class="modal-content">
 				<div class="form-group col s6">
 					<label> Holiday: </label>

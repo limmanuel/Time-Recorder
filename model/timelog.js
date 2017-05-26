@@ -92,6 +92,7 @@ module.exports.updateStatus = function(query, status, callback){
 	},
 	 callback);
 }
+
 module.exports.deleteUser = function(query, callback){
 	TimeLog.delete(query,callback);
 }

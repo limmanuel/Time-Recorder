@@ -823,7 +823,7 @@ router.post('/:team/:id/admin/settings/update/', ensureAuthenticated, function (
 });
 
 //Add Holidays
-router.post('/:team/:id/admin/settings/add', ensureAuthenticated,  function(req,res,next){
+router.post('/:team/:id/admin/settings/holiday/add', ensureAuthenticated,  function(req,res,next){
 	var query = {team: req.params.team};
 	holiday_date = moment(req.body.holiday_date).format('MM-DD-YYYY')
 	var holiday = {
@@ -856,6 +856,15 @@ router.post('/:team/:id/admin/settings/add', ensureAuthenticated,  function(req,
 		Account.addHoliday(query, holiday, function(err, holiday){
 			res.redirect('/'+req.params.team+'/'+req.params.id+'/admin/?tab=Account');
 		});
+	});
+});
+
+//Delete Request
+router.post('/:team/:id/admin/settings/delete/holiday/:holiday_id', function(req,res,next){
+	let query = {team: req.params.team};
+	Account.delHoliday(query, req.params.holiday_id, function(err, response){
+		if(err){return console.log(err);}
+			res.redirect('/'+req.params.team+'/'+req.params.id+'/admin/?tab=Account');
 	});
 });
 
