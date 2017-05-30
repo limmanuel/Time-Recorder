@@ -1,0 +1,39 @@
+
+<div class="row">
+	<form method="post" action="/{{team.team}}/{{user_id}}/report">
+		<div class="form-group col s4">
+			<label>From:</label>
+			<input type="date" max="{{moment asd 'YYYY-MM-DD'}}" class="form-control" name="from_date">
+		</div>
+		<script type="text/javascript">report_limits.remove()</script>
+		<div class="form-group col s4">
+			<label>To:</label>
+			<input type="date" max="{{moment asd 'YYYY-MM-DD'}}" class="form-control" name="to_date">
+		</div>
+		<button type="submit" class="waves-effect waves-light btn col s4">Get Report</button>
+	</form>
+	<table class="table-responsive bordered">
+		<tr>
+			<th>Id</th>
+			<th>User</th>
+			<th>Data</th>
+		</tr>
+		{{#each user}}
+		<tr>
+			<td>{{id}}</td>
+			<td>Name: {{first_name}} {{last_name}}<br>
+				Email: {{email}}<br>
+				Position: {{position}}</td>
+			<td>
+				{{#each ../count}}{{#equal user_id ../id}}
+				Present: {{present}}<br>
+				Late: {{late}}<br>
+				Absent: {{absent}}<br>
+				Sick: {{sick}}<br>
+				Vacation: {{vacation}}
+				{{/equal}}{{/each}}
+			</td>
+		</tr>
+		{{/each}}
+	</table>
+</div>

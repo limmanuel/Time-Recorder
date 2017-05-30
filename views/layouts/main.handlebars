@@ -5,7 +5,6 @@
 		<title>Wizy Test</title>
 		<link rel="stylesheet" href="/css/materialize.css">
 		<link rel="stylesheet" href="/css/style.css">
-		<link rel="stylesheet" href="/js/js-datepicker/datepicker.css">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	</head>
 	<body onload="updateClock(); setInterval('updateClock()', 1000 )">
@@ -83,7 +82,7 @@
 				{{/equal}}
 		      	{{#equal page 'admin'}}
 					<ul class="tabs tabs-transparent grey darken-3">
-			      	{{#equal tab 'user'}}
+			      	{{#equal tab 'User'}}
 						<li class="tab"><a class="active" href="#User">Manage User</a></li>
 					{{else}}
 						<li class="tab"><a href="#User">Manage User</a></li>
@@ -117,6 +116,7 @@
             	<li><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
             	{{#equal wuser.position 'User'}}
             	{{else}}
+            		<li><a href="/{{team.team}}/{{user_id}}/report">Report</a></li>
             		<li><a href="/{{team.team}}/{{user_id}}/create">Create Users</a></li>
             		<li><a href="/{{team.team}}/{{user_id}}/admin">Admin</a></li>
             	{{/equal}}
@@ -149,6 +149,5 @@
 		<script src="/bower_components/jquery/dist/jquery.js"></script>
 		<script src="/js/main.js"></script>
 		<script src="/js/materialize.js"></script>
-		<script src="/js/js-datepicker/datepicker.js"></script>
 	</body>
 </html>

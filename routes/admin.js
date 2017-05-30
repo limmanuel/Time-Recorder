@@ -4,6 +4,10 @@ var moment = require('moment');
 var passport = require('passport');
 var localstr = require('passport-local').Strategy;
 var datepicker = require('js-datepicker');
+require("moment-duration-format");
+var nodemailer = require('nodemailer');
+var json2csv = require('json2csv');
+var fs = require('fs');
 
 //Mongoose Schema
 let Account = require('../model/account.js');
@@ -38,7 +42,7 @@ router.post('/register', function(req,res,next){
 
 	Account.getAccounts(function(err,acc){
 		acc.forEach(function(a){
-			if(a.team == team){console.log("enter");
+			if(a.team == team){
 				err = 'Team already exist';
 			}
 		});
@@ -125,12 +129,48 @@ router.get('/login', function(req,res,next){
 							var name = user.first_name+' '+user.last_name;
 							Time.getTimeLogsByUser(userid, function(err, logs){
 								var l = 0;
+								var h = 0;
+								var h_date = [];
 								var date_now = moment().format('MM-DD-YYYY');
+								var year = moment().format('-YYYY');
 								logs.forEach(function(log){
-									if(log.date == moment().format('MM-DD-YYYY')){
+									if(log.date == date_now){
 										l=1;
 									}
+									account.holiday.forEach(function(holidays){
+										if(log.date == (holidays.date+year)){
+											h=1;
+										} else {
+											h_date.push(holidays.date);
+										}
+									});
 								});
+								if(h == 0){
+									h_date.forEach(function(date){
+										var holiday_date = date;
+										var newLog = new Time ({
+											date: holiday_date+year,
+											team: team,
+											user_id: user._id,
+											name: user.first_name + ' ' + user.last_name,
+											status: {
+											status: "Holiday"
+											},
+											timein: {
+												timein: "N/A"
+											},
+											timeout: {
+												timeout: "N/A"
+											}
+										});
+										newLog.save(function(err){
+											if(err){
+												console.log(err);
+											}
+											h=0;
+										});
+									});
+								}
 								if(l == 0){
 									var newLog = new Time ({
 										date: date_now,
@@ -149,8 +189,8 @@ router.get('/login', function(req,res,next){
 										var status = {
 											status: "Absent"
 										}
-										console.log(user.first_name);
 										Time.addStatus(query, status, function(err, data){});
+										l=1;
 									});
 								}
 								var sched = account.sched_out+':00';
@@ -196,7 +236,6 @@ passport.use(new localstr({passReqToCallback: true}, function(req,username,passw
 		if(!user){
 			return done(null,false,{message:'No user found'})
 		}
-		console.log('You are logged in to '+ team);
 		Wuser.comparePassword(password,user.password,function(err,isMatch){
 			if (err){
 				console.log(err);
@@ -268,18 +307,18 @@ router.get('/logout', function(req,res,next){
 //----------------Profile Page-----------------
 router.get('/:team/:id',ensureAuthenticated, function (req,res,next){
 	if(req.query.month){
-		var filterMonth = req.query.month;
+		var filterMonth = req.query.month.split(',');
 		if(req.query.status){
 			var filterStatus = req.query.status.split(',');
 		} else {
-			var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+			var filterStatus = ['Absent', 'Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
 		}
 	} else {
-		var filterMonth = moment().format('MM');
+		var filterMonth = ['01','02','03','04','05','06','07','08','09','10','11','12'];
 		if(req.query.status){
 			var filterStatus = req.query.status.split(',');
 		} else {
-			var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+			var filterStatus = ['Absent', 'Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
 		}
 	}
 	 if(req.query.tab) {
@@ -406,7 +445,7 @@ router.post('/:team/:id/status/:dates', ensureAuthenticated,  function(req,res,n
 });
 
 //Request Leave
-router.post('/:team/:id/leave/form/:dates', ensureAuthenticated, function(req,res,next){
+router.post('/:team/:id/leave/form', ensureAuthenticated, function(req,res,next){
 	var date = req.body.leave;
 	if(moment(date).format('MM-DD-YYYY') == moment().format('MM-DD-YYYY')){
 		res.render('index', {
@@ -427,9 +466,33 @@ router.post('/:team/:id/leave/form/:dates', ensureAuthenticated, function(req,re
 			}
 			res.redirect('/'+req.params.team+'/'+req.params.id);
 		});
+		Wuser.getUsersByTeam(req.params.team, function(err, users){
+			users.forEach(function(user){
+				if(user.position !== 'User'){
+					var transporter = nodemailer.createTransport({
+						service:'Gmail',
+						auth: {
+							user: 'rndmlpz@gmail.com',
+							pass: "'      '"
+						},tls: { rejectUnauthorized: false }
+					});
+
+					var mailOptions = {
+						from: '"[Time-Recorder]" <rndmlpz@gmail.com>',
+						to: user.email,
+						subject: '[Time-Recorder]Leave Request: '+ req.body.team,
+						text: 'Message from Time Recorder Name: '+ req.body.name + 'Email: ' + req.body.email + 'Leave Date: ' + req.body.leave + 'Message: ' + req.body.message ,
+						html: '<p>Message from Time Recorder </p><ul><li>Name: '+ req.body.name + '</li><li>Email: ' + req.body.email + '</li><li>Leave Date: ' + req.body.leave + '</li><li>Message: ' + req.body.message + '</li></ul>'
+					}
+					transporter.sendMail(mailOptions,function(error,info){
+						if(error){return console.log(error);}
+						res.redirect('/'+req.params.team+'/'+req.params.id);
+					});
+				}
+			});
+		});
 	}
 });
-
 
 //History Tab
 //Filter
@@ -562,18 +625,18 @@ router.post('/:team/:id', ensureAuthenticated, function(req,res,next){
 //-------------------Dashboard Page------------------------
 router.get('/:team/:id/dashboard', ensureAuthenticated, function (req,res,next){
 	if(req.query.month){
-		var filterMonth = req.query.month;
+		var filterMonth = req.query.month.split(',');
 		if(req.query.status){
 			var filterStatus = req.query.status.split(',');
 		} else {
-			var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+			var filterStatus = ['Absent', 'Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
 		}
 	} else {
-		var filterMonth = moment().format('MM');
+		var filterMonth = ['01','02','03','04','05','06','07','08','09','10','11','12'];
 		if(req.query.status){
 			var filterStatus = req.query.status.split(',');
 		} else {
-			var filterStatus = ['Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+			var filterStatus = ['Absent', 'Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
 		}
 	}
 	 if(req.query.tab) {
@@ -679,15 +742,18 @@ router.get('/:team/:id/admin', ensureAuthenticated, function (req,res,next){
 			Account.getAccountByTeam(req.params.team, function(err,team){
 				Wuser.getUserById(req.params.id, function(err, wuser){
 					Wuser.getUsersByTeam(req.params.team, function(err, users){
-						res.render('admin', {
-							page: 'admin',
-							tab: tab,
-							dates: moment().format('MM-DD-YYYY'),
-							time: moment().format('HH:mm:ss'),
-							wuser: wuser,
-							user: users,
-							user_id: req.params.id,
-							team: team
+						Time.getTimeLogsByTeam(req.params.team, function(err,logs){
+							res.render('admin', {
+								page: 'admin',
+								tab: tab,
+								dates: moment().format('MM-DD-YYYY'),
+								time: moment().format('HH:mm:ss'),
+								wuser: wuser,
+								user: users,
+								user_id: req.params.id,
+								team: team,
+								logs: logs
+							});
 						});
 					});
 				});
@@ -767,7 +833,7 @@ router.post('/:team/:id/admin/settings/update/', ensureAuthenticated, function (
 	Account.getAccounts(function(err,acc){
 		acc.forEach(function(a){
 			if(a.team == last_team){
-			} else if(a.team == team){console.log("enter");
+			} else if(a.team == team){
 				err = 'Team already exist';
 			}
 		});
@@ -825,15 +891,16 @@ router.post('/:team/:id/admin/settings/update/', ensureAuthenticated, function (
 //Add Holidays
 router.post('/:team/:id/admin/settings/holiday/add', ensureAuthenticated,  function(req,res,next){
 	var query = {team: req.params.team};
-	holiday_date = moment(req.body.holiday_date).format('MM-DD-YYYY')
+	var holiday_date = moment(req.body.holiday_date).format('MM-DD')
 	var holiday = {
 		name: req.body.holiday_name,
 		date: holiday_date
 	}
+	var year = moment().format('-YYYY');
 	Wuser.getUsersByTeam(req.params.team, function(err, users){
 		users.forEach(function(user){
 			var newLog = new Time ({
-				date: holiday_date,
+				date: holiday_date+year,
 				team: req.params.team,
 				user_id: user._id,
 				name: user.first_name + ' ' + user.last_name,
@@ -859,7 +926,7 @@ router.post('/:team/:id/admin/settings/holiday/add', ensureAuthenticated,  funct
 	});
 });
 
-//Delete Request
+//Delete Holiday
 router.post('/:team/:id/admin/settings/delete/holiday/:holiday_id', function(req,res,next){
 	let query = {team: req.params.team};
 	Account.delHoliday(query, req.params.holiday_id, function(err, response){
@@ -868,6 +935,162 @@ router.post('/:team/:id/admin/settings/delete/holiday/:holiday_id', function(req
 	});
 });
 
+//-------------------------Report Page-------------------------------
+//get report
+router.get('/:team/:id/report', ensureAuthenticated, function(req,res,next){
+	Wuser.getUserById(req.params.id, function(err, wuser){
+		if(wuser.position == 'User'){
+			res.redirect('/'+req.params.team+'/'+req.params.id);
+		} else {
+//			var from = moment(req.body.from_date).format('MM-DD-YYYY');
+//			var to = moment(req.body.to_date).format('MM-DD-YYYY');
+			var count = [];
+			Account.getAccountByTeam(req.params.team, function(err,team){
+				Wuser.getUsersByTeam(req.params.team, function(err, users){
+					Time.getTimeLogsByTeam(req.params.team, function(err,logs){
+					users.forEach(function(user){
+						var present_count = 0;
+						var late_count = 0;
+						var absent_count = 0;
+						var sick_count = 0;
+						var vacation_count = 0;
+						var arr = {};
+						logs.forEach(function(log){
+							if(log.user_id == user.id){
+	//							if(log.date >= from && log.date <= to){
+										if(log.status[0].status == 'Present'){
+											present_count++;
+										}
+										if(log.status[0].status == 'Late'){
+											late_count++;
+										}
+										if(log.status[0].status == 'Absent'){
+											absent_count++;
+										}
+										if(log.status[0].status == 'Sick'){
+											sick_count++;
+										}
+										if(log.status[0].status == 'Vacation'){
+											vacation_count++;
+										}
+	//							}
+							}
+						});
+						var userid = user.id;
+						arr = {user_id: userid, present: present_count, late: late_count, absent: absent_count, sick: sick_count, vacation: vacation_count};
+						count.push(arr);
+					});
+						res.render('report', {
+							page: 'report',
+							dates: moment().format('MM-DD-YYYY'),
+							time: moment().format('HH:mm:ss'),
+							wuser: wuser,
+							user: users,
+							user_id: req.params.id,
+							team: team,
+							logs: logs,
+							count: count
+						});
+					});
+				});
+			});
+		}
+	});
+});
+
+//get report
+router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
+	Wuser.getUserById(req.params.id, function(err, wuser){
+		var month = moment().format('MM-')
+		var year = moment().format('-YYYY')
+		if(wuser.position == 'User'){
+			res.redirect('/'+req.params.team+'/'+req.params.id);
+		} else {
+			if(req.body.from_date){
+				var from = moment(req.body.from_date).format('MM-DD-YYYY');
+				if(req.body.to_date){
+					var to = moment(req.body.to_date).format('MM-DD-YYYY');
+				} else {
+					var to = moment().format('MM-DD-YYYY');
+				}
+			} else {
+				var from = moment(month+'01'+year).format('MM-DD-YYYY');
+				if(req.body.to_date){
+					var to = moment(req.body.to_date).format('MM-DD-YYYY');
+				} else {
+					var to = moment().format('MM-DD-YYYY');
+				}
+			}
+			console.log(from+'-'+to);
+			var count = [];
+			Account.getAccountByTeam(req.params.team, function(err,team){
+				Wuser.getUsersByTeam(req.params.team, function(err, users){
+					Time.getTimeLogsByTeam(req.params.team, function(err,logs){
+						users.forEach(function(user){
+							var present_count = 0;
+							var late_count = 0;
+							var absent_count = 0;
+							var sick_count = 0;
+							var vacation_count = 0;
+							var arr = {};
+							logs.forEach(function(log){
+								if(log.user_id == user.id){
+									if(log.date >= from && log.date <= to){
+										log.status.forEach(function(status){
+											if(status.status == 'Present'){
+												present_count++;
+											}
+											if(status.status == 'Late'){
+												late_count++;
+											}
+											if(status.status == 'Absent'){
+												absent_count++;
+											}
+											if(status.status == 'Sick'){
+												sick_count++;
+											}
+											if(status.status == 'Vacation'){
+												vacation_count++;
+											}
+										});
+									}
+								}
+							});
+							var userid = user.id;
+							var name = user.first_name + ' ' + user.last_name;
+							arr = {user_id: userid,
+								name: name,
+								present: present_count, 
+								late: late_count, 
+								absent: absent_count, 
+								sick: sick_count, 
+								vacation: vacation_count};
+							count.push(arr);
+						});
+						var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation'];
+						var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation'];
+						var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});
+						fs.writeFile('report('+from+')to('+to+').csv', csv, function(err) {
+						  if (err) throw err;
+						  console.log('file saved');
+						});
+						res.render('report', {
+							page: 'report',
+							dates: moment().format('MM-DD-YYYY'),
+							time: moment().format('HH:mm:ss'),
+							wuser: wuser,
+							user: users,
+							user_id: req.params.id,
+							team: team,
+							logs: logs,
+							count: count
+						});
+					});
+				});
+			});
+		}
+	});
+});
 
 //------------------------Create User----------------------------
 //Create Page
@@ -960,6 +1183,7 @@ router.post('/:team/:id/create', ensureAuthenticated, function(req,res,next){
 		});
 	}
 });
+
 
 //Authentication
 function ensureAuthenticated(req,res,next){

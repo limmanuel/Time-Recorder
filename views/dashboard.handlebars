@@ -1,5 +1,5 @@
 </div>
-<div>
+<div class="row">
 <div class="row">
 <div id="Home" class="col s12">
 {{#each user}}
@@ -128,10 +128,10 @@
 {{/each}}
 </div>
 </div>
-<div id="History" class="col s12 container">
+<div id="History" class="col l10 offset-l1 container">
 <form method="post" action="/{{team.team}}/{{user_id}}/dashboard/filter" class="row">
 	<div class="form-group col m3 s5">
-		<select name="filterMonth">
+		<select multiple name="filterMonth">
 			<option disabled selected>Select Month</option>
 			<option value="01">January</option>
 			<option value="02">Febuary</option>
@@ -150,6 +150,7 @@
 	<div class="form-group col m3 s5">
 		<select multiple name="filterStatus">
 			<option disabled selected>Select Status</option>
+			<option value="Absent">Absent</option>
 			<option value="Present">Present</option>
 			<option value="Late">Late</option>
 			<option value="Sick">Sick</option>
@@ -159,64 +160,84 @@
 	</div>
 	<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col l2 m3 s2">Filter</button>
 </form>
-<table class="responsive-table striped col m12">
+<table class="responsive-table bordered col m12">
 	<tr>
 		<th>Name</th>
 		<th>Date</th>
 		<th>Time In</th>
 		<th>Time Out</th>
 		<th>Status</th>
+		<th>Duration</th>
 	</tr>
 {{#each logs}}
 	{{#each ../user}}
 		{{#equal id ../user_id}}
 			{{#each ../status}}
 				{{#if status}}
-					{{#equal ../../../filterMonth (moment ../../date 'MM')}}
-						{{#each ../../../filterStatus}}
-							{{#equal this ../status}}
-								<tr>
-									<td>
-										{{../../first_name}} {{../../last_name}}
-									</td>
-									<td>
-										{{moment ../../date 'MMM DD YYYY'}}
-									</td>
-									<td>
-										{{#each ../../../timein}}
-											{{#equal @../../index @index}}
-												{{#equal timein 'N/A'}}
-													{{timein}}
-												{{else}}
-													{{moment (add ../../../../date timein) 'hh:mm:ss A'}}
+					{{#each ../../../filterMonth}}
+						{{#equal this (moment ../../date 'MM')}}
+							{{#each ../../../../filterStatus}}
+								{{#equal this ../../status}}
+									<tr>
+										<td>
+											{{../../../first_name}} {{../../../last_name}}
+										</td>
+										<td>
+											{{moment ../../../../date 'MMM DD YYYY'}}
+										</td>
+										<td>
+											{{#each ../../../../timein}}
+												{{#equal @../../../index @index}}
+													{{#equal timein 'N/A'}}
+														{{timein}}
+													{{else}}
+														{{moment (add ../../../../../date timein) 'hh:mm:ss A'}}
+													{{/equal}}
 												{{/equal}}
-											{{/equal}}
-										{{/each}}
-									</td>
-									<td>
-										{{#each ../../../timeout}}
-											{{#equal @../../index @index}}
-												{{#equal timeout 'N/A'}}
-													{{timeout}}
-												{{else}}
-													{{moment (add ../../../../date timeout) 'hh:mm:ss A'}}
+											{{/each}}
+										</td>
+										<td>
+											{{#each ../../../../timeout}}
+												{{#equal @../../../index @index}}
+													{{#equal timeout 'N/A'}}
+														{{timeout}}
+													{{else}}
+														{{moment (add ../../../../../date timeout) 'hh:mm:ss A'}}
+													{{/equal}}
 												{{/equal}}
-											{{/equal}}
-										{{/each}}
-									</td>
-									<td>
-										{{../status}}
-									</td>
-								</tr>
-							{{/equal}}
-						{{/each}}
-					{{/equal}}
+											{{/each}}
+										</td>
+										<td>
+											{{../../status}}
+										</td>
+										<td>
+											{{#each ../../../../timeout}}
+												{{#equal @../../../index @index}}
+													{{#each ../../../../../timein}}
+														{{#equal @../index @index}}
+															{{#equal ../../../../status 'Present'}}
+																{{duration ../timeout timein}}
+															{{/equal}}
+															{{#equal ../../../../status 'Late'}}
+																{{duration ../timeout timein}}
+															{{/equal}}
+														{{/equal}}
+													{{/each}}
+												{{/equal}}
+											{{/each}}
+										</td>
+									</tr>
+								{{/equal}}
+							{{/each}}
+						{{/equal}}
+					{{/each}}
 				{{/if}}
 			{{/each}}
 		{{/equal}}
 	{{/each}}
 {{/each}}
 </table>
+</div>
 </div>
 {{#equal wuser.position 'User'}}
 {{else}}

@@ -35,7 +35,7 @@ var TimeLog = module.exports = mongoose.model('Timelog', timelogSchema);
 
 module.exports.getTimeLogsByUser = function(id,callback){
 	let query = {user_id: id};
-	TimeLog.find(query,callback);
+	TimeLog.find(query,callback).sort([['date','ascending']]);
 }
 
 module.exports.getTimeLogsByDate = function(date,team,callback){

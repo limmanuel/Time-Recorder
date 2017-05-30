@@ -127,7 +127,7 @@
 </div>
 <div class="row">
 <h3>Holidays</h3>
-	<table>
+	<table class="table-responsive bordered">
 		<tr>
 			<th>Holiday</th>
 			<th>Date</th>
@@ -136,7 +136,7 @@
 		{{#each team.holiday}}
 			<tr>
 				<td>{{name}}</td>
-				<td>{{moment date 'MMM DD YYYY'}}</td>
+				<td>{{moment (add date (moment ../dates 'YYYY')) 'MMM DD YYYY'}}</td>
 				<td>
 					<button class="btn red waves-effect waves-light delete-form" data-target="holiday{{_id}}">Delete</button>
 					<div id="holiday{{_id}}" class="modal">
