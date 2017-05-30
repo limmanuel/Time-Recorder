@@ -8,6 +8,7 @@ require("moment-duration-format");
 var nodemailer = require('nodemailer');
 var json2csv = require('json2csv');
 var fs = require('fs');
+var path = require('path');
 
 //Mongoose Schema
 let Account = require('../model/account.js');
@@ -1021,7 +1022,6 @@ router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 					var to = moment().format('MM-DD-YYYY');
 				}
 			}
-			console.log(from+'-'+to);
 			var count = [];
 			Account.getAccountByTeam(req.params.team, function(err,team){
 				Wuser.getUsersByTeam(req.params.team, function(err, users){
@@ -1070,10 +1070,10 @@ router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 						var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation'];
 						var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation'];
 						var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});
-						fs.writeFile('report('+from+')to('+to+').csv', csv, function(err) {
+						fs.writeFile(__dirname+'/../report('+from+')to('+to+').csv', csv, function(err) {
 						  if (err) throw err;
-						  console.log('file saved');
 						});
+						console.log(__dirname+'/../report('+from+')to('+to+').csv');
 						res.render('report', {
 							page: 'report',
 							dates: moment().format('MM-DD-YYYY'),
