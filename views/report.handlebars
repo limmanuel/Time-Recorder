@@ -16,6 +16,7 @@
 			<th>Id</th>
 			<th>User</th>
 			<th>Data</th>
+			<th>Hours Spent</th>
 		</tr>
 		{{#each user}}
 		<tr>
@@ -23,15 +24,18 @@
 			<td>Name: {{first_name}} {{last_name}}<br>
 				Email: {{email}}<br>
 				Position: {{position}}</td>
-			<td>
-				{{#each ../count}}{{#equal user_id ../id}}
-				Present: {{present}}<br>
-				Late: {{late}}<br>
-				Absent: {{absent}}<br>
-				Sick: {{sick}}<br>
-				Vacation: {{vacation}}
-				{{/equal}}{{/each}}
-			</td>
+			{{#each ../count}}{{#equal user_id ../id}}
+				<td>
+					Present: {{present}}<br>
+					Late: {{late}}<br>
+					Absent: {{absent}}<br>
+					Sick: {{sick}}<br>
+					Vacation: {{vacation}}
+				</td>
+				<td>
+					{{hours}}
+				</td>
+			{{/equal}}{{/each}}
 		</tr>
 		{{/each}}
 	</table><br>

@@ -120,13 +120,13 @@
 				    </div>
 			    </li>
             	<li><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
+            	<li><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
             	{{#equal wuser.position 'User'}}
             	{{else}}
             		<li><a href="/{{team.team}}/{{user_id}}/report">Report</a></li>
             		<li><a href="/{{team.team}}/{{user_id}}/create">Create Users</a></li>
             		<li><a href="/{{team.team}}/{{user_id}}/admin">Admin</a></li>
             	{{/equal}}
-            	<li><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
             	<li><a href="/logout">Logout</a></li>
           	{{else}}
             	<li><a href="/login">Login</a></li>

@@ -237,67 +237,52 @@
 {{#each logs}}
 	{{#each ../user}}
 		{{#equal id ../user_id}}
-			{{#each ../status}}
-				{{#if status}}
-					{{#each ../../../filterMonth}}
-						{{#equal this (moment ../../date 'MM')}}
-							{{#each ../../../../filterStatus}}
-								{{#equal this ../../status}}
+					{{#each ../../filterMonth}}
+						{{#equal this (moment ../date 'MM')}}
+							{{#each ../../../filterStatus}}
+								{{#equal this ../../../status.0.status}}
 									<tr>
 										<td>
-											{{../../../first_name}} {{../../../last_name}}
+											{{../../first_name}} {{../../last_name}}
 										</td>
 										<td>
-											{{moment ../../../../date 'MMM DD YYYY'}}
+											{{moment ../../../date 'MMM DD YYYY'}}
 										</td>
 										<td>
-											{{#each ../../../../timein}}
-												{{#equal @../../../index @index}}
-													{{#equal timein 'N/A'}}
-														{{timein}}
-													{{else}}
-														{{moment (add ../../../../../date timein) 'hh:mm:ss A'}}
-													{{/equal}}
+											{{#if ../../../timein.0.timein}}
+												{{#equal ../../../timein.0.timein 'N/A'}}
+													{{../../../timein.0.timein}}
+												{{else}}
+													{{moment (add ../../../date ../../../timein.0.timein) 'hh:mm:ss A'}}
 												{{/equal}}
-											{{/each}}
+											{{/if}}
 										</td>
 										<td>
-											{{#each ../../../../timeout}}
-												{{#equal @../../../index @index}}
-													{{#equal timeout 'N/A'}}
-														{{timeout}}
-													{{else}}
-														{{moment (add ../../../../../date timeout) 'hh:mm:ss A'}}
-													{{/equal}}
+											{{var 't' (lastArr ../../../timeout)}}
+											{{#if t}}
+												{{#equal t.timeout 'N/A'}}
+													{{t.timeout}}
+												{{else}}
+													{{moment (add ../../../date t.timeout) 'hh:mm:ss A'}}
 												{{/equal}}
-											{{/each}}
+											{{/if}}
 										</td>
 										<td>
-											{{../../status}}
+											{{../../../status.0.status}}
 										</td>
 										<td>
-											{{#each ../../../../timeout}}
-												{{#equal @../../../index @index}}
-													{{#each ../../../../../timein}}
-														{{#equal @../index @index}}
-															{{#equal ../../../../status 'Present'}}
-																{{duration ../timeout timein}}
-															{{/equal}}
-															{{#equal ../../../../status 'Late'}}
-																{{duration ../timeout timein}}
-															{{/equal}}
-														{{/equal}}
-													{{/each}}
+											{{#if t}}
+												{{#equal ../../../timein.0.timein 'N/A'}}
+												{{else}}
+													{{duration t.timeout ../../../timein.0.timein}}
 												{{/equal}}
-											{{/each}}
+											{{/if}}
 										</td>
 									</tr>
 								{{/equal}}
 							{{/each}}
 						{{/equal}}
 					{{/each}}
-				{{/if}}
-			{{/each}}
 		{{/equal}}
 	{{/each}}
 {{/each}}

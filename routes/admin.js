@@ -632,14 +632,14 @@ router.get('/:team/:id/dashboard', ensureAuthenticated, function (req,res,next){
 		if(req.query.status){
 			var filterStatus = req.query.status.split(',');
 		} else {
-			var filterStatus = ['Absent', 'Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+			var filterStatus = ['Absent', 'Present', 'Late', 'Sick', 'Vacation'];
 		}
 	} else {
 		var filterMonth = ['01','02','03','04','05','06','07','08','09','10','11','12'];
 		if(req.query.status){
 			var filterStatus = req.query.status.split(',');
 		} else {
-			var filterStatus = ['Absent', 'Present', 'Late', 'Sick', 'Vacation', 'Holiday'];
+			var filterStatus = ['Absent', 'Present', 'Late', 'Sick', 'Vacation'];
 		}
 	}
 	 if(req.query.tab) {
@@ -959,10 +959,17 @@ router.get('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 						var absent_count = 0;
 						var sick_count = 0;
 						var vacation_count = 0;
+						var hours_spent = "00s";
+						var ms = 0;
 						var arr = {};
 						logs.forEach(function(log){
 							if(log.user_id == user.id){
-								if(log.date >= from && log.date <= to){
+								if(log.date >= from && log.date <= to && log.timeout[0]){
+									if(log.timeout[log.timeout.length-1] && log.timein[0].timein !== 'N/A' && log.timein[0].timein){
+										var milli = moment(log.timeout[log.timeout.length-1].timeout,"HH:mm:ss").diff(moment(log.timein[0].timein,"HH:mm:ss"));
+										ms=ms+milli;
+										hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+									}
 									if(log.status[0].status == 'Present'){
 										present_count++;
 									}
@@ -982,7 +989,14 @@ router.get('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 							}
 						});
 						var userid = user.id;
-						arr = {user_id: userid, present: present_count, late: late_count, absent: absent_count, sick: sick_count, vacation: vacation_count};
+						arr = {user_id: userid, 
+							present: present_count, 
+							late: late_count, absent: 
+							absent_count, 
+							sick: sick_count, 
+							vacation: vacation_count, 
+							hours: hours_spent
+						};
 						count.push(arr);
 					});
 						res.render('report', {
@@ -1038,10 +1052,17 @@ router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 							var absent_count = 0;
 							var sick_count = 0;
 							var vacation_count = 0;
+							var hours_spent = "00s";
+							var ms = 0;
 							var arr = {};
 							logs.forEach(function(log){
 								if(log.user_id == user.id){
-									if(log.date >= from && log.date <= to){
+									if(log.date >= from && log.date <= to && log.timeout[0]){
+										if(log.timeout[log.timeout.length-1] && log.timein[0].timein !== 'N/A' && log.timein[0].timein){
+											var milli = moment(log.timeout[log.timeout.length-1].timeout,"HH:mm:ss").diff(moment(log.timein[0].timein,"HH:mm:ss"));
+											ms=ms+milli; 
+											hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+										}
 										if(log.status[0].status == 'Present'){
 											present_count++;
 										}
@@ -1068,14 +1089,10 @@ router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 								late: late_count, 
 								absent: absent_count, 
 								sick: sick_count, 
-								vacation: vacation_count};
+								vacation: vacation_count,
+								hours: hours_spent
+							};
 							count.push(arr);
-						});
-						var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation'];
-						var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation'];
-						var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});
-						fs.writeFile('report('+from+')to('+to+').csv', csv, function(err) {
-						  if (err) throw err;
 						});
 						res.render('report', {
 							page: 'report',
@@ -1111,10 +1128,17 @@ router.post('/:team/:id/report/download', ensureAuthenticated, function(req,res,
 					var absent_count = 0;
 					var sick_count = 0;
 					var vacation_count = 0;
+					var hours_spent = "00s";
+					var ms = 0;
 					var arr = {};
 					logs.forEach(function(log){
 						if(log.user_id == user.id){
-							if(log.date >= from && log.date <= to){
+							if(log.date >= from && log.date <= to && log.timeout[0]){
+								if(log.timeout[log.timeout.length-1] && log.timein[0].timein !== 'N/A' && log.timein[0].timein){
+									var milli = moment(log.timeout[log.timeout.length-1].timeout,"HH:mm:ss").diff(moment(log.timein[0].timein,"HH:mm:ss"));
+									ms=ms+milli;
+									hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+								}
 								if(log.status[0].status == 'Present'){
 									present_count++;
 								}
@@ -1141,17 +1165,14 @@ router.post('/:team/:id/report/download', ensureAuthenticated, function(req,res,
 						late: late_count, 
 						absent: absent_count, 
 						sick: sick_count, 
-						vacation: vacation_count};
+						vacation: vacation_count,
+						hours: hours_spent
+					};
 					count.push(arr);
 				});
-				var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation'];
-				var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation'];
+				var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation', 'hours'];
+				var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation', 'Hours Spent'];
 				var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});
-				fs.writeFile('report('+from+')to('+to+').csv', csv, function(err) {
-					if(err){
-						console.log(err);
-					}
-				});
 				res.setHeader('Content-disposition', 'attachment; filename=report('+from+')to('+to+').csv');
 				res.set('Content-Type', 'text/csv');
 				res.status(200).send(csv);

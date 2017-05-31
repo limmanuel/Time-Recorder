@@ -9,7 +9,7 @@ var flash = require('connect-flash');
 var passport = require('passport');
 var Handlebars = require('handlebars');
 var moment = require('moment');
- var datepicker = require('js-datepicker');
+var datepicker = require('js-datepicker');
 
 var index = require('./routes/admin');
 

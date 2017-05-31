@@ -235,58 +235,44 @@
 			<th>Duration</th>
 		</tr>
 		{{#each logs}}
-			{{#each status}}
-				{{#each ../../filterMonth}}
-					{{#equal this (moment ../../date 'MM')}}
-						{{#each ../../../filterStatus}}
-							{{#equal this ../../status}}
-							<form method="post" action="/{{../../../../team.team}}/{{../../../../user_id}}/time">
+				{{#each ../filterMonth}}
+					{{#equal this (moment ../date 'MM')}}
+						{{#each ../../filterStatus}}
+							{{#equal this ../../status.0.status}}
+							<form method="post" action="/{{../../../team.team}}/{{../../../user_id}}/time">
 								<tr>
 									<td>
-										{{moment ../../../date 'MMM DD YYYY'}}
+										{{moment ../../date 'MMM DD YYYY'}}
 									</td>
 									<td>
-										{{#each ../../../timein}}
-											{{#equal @../../../index @index}}
-												{{#equal timein 'N/A'}}
-													{{timein}}
-												{{else}}
-													{{moment (add ../../../../date timein) 'hh:mm:ss A'}}
-													<input type="hidden" name="timein" value="{{add ../../../date timein}}">
-												{{/equal}}
+										{{#if ../../timein.0.timein}}
+											{{#equal ../../timein.0.timein 'N/A'}}
+												{{../../timein.0.timein}}
+											{{else}}
+												{{moment (add ../../date ../../timein.0.timein) 'hh:mm:ss A'}}
 											{{/equal}}
-										{{/each}}
+										{{/if}}
 									</td>
 									<td>
-										{{#each ../../../timeout}}
-											{{#equal @../../../index @index}}
-												{{#equal timeout 'N/A'}}
-													{{timeout}}
-												{{else}}
-													{{moment (add ../../../../date timeout) 'hh:mm:ss A'}}
-													<input type="hidden" name="timeout" value="{{add ../../../date timeout}}">
-												{{/equal}}
+										{{var 't' (lastArr ../../timeout)}}
+										{{#if t}}
+											{{#equal t.timeout 'N/A'}}
+												{{t.timeout}}
+											{{else}}
+												{{moment (add ../../date t.timeout) 'hh:mm:ss A'}}
 											{{/equal}}
-										{{/each}}
+										{{/if}}
 									</td>
 									<td>
-										{{../../status}}
+										{{../../status.0.status}}
 									</td>
 									<td>
-										{{#each ../../../timeout}}
-											{{#equal @../../../index @index}}
-												{{#each ../../../../timein}}
-													{{#equal @../index @index}}
-														{{#equal ../../../../status 'Present'}}
-															{{duration ../timeout timein}}
-														{{/equal}}
-														{{#equal ../../../../status 'Late'}}
-															{{duration ../timeout timein}}
-														{{/equal}}
-													{{/equal}}
-												{{/each}}
+										{{#if t}}
+											{{#equal ../../timein.0.timein 'N/A'}}
+											{{else}}
+												{{duration t.timeout ../../timein.0.timein}}
 											{{/equal}}
-										{{/each}}
+										{{/if}}
 									</td>
 								</tr>
 							</form>
@@ -294,7 +280,6 @@
 						{{/each}}
 					{{/equal}}
 				{{/each}}
-			{{/each}}
 		{{/each}}
 	</table>
 </div>
