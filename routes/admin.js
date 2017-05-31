@@ -943,8 +943,10 @@ router.get('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 		if(wuser.position == 'User'){
 			res.redirect('/'+req.params.team+'/'+req.params.id);
 		} else {
-//			var from = moment(req.body.from_date).format('MM-DD-YYYY');
-//			var to = moment(req.body.to_date).format('MM-DD-YYYY');
+			var month = moment().format('MM-')
+			var year = moment().format('-YYYY')
+			var from = moment(month+'01'+year).format('MM-DD-YYYY');
+			var to = moment().format('MM-DD-YYYY');
 			var count = [];
 			Account.getAccountByTeam(req.params.team, function(err,team){
 				Wuser.getUsersByTeam(req.params.team, function(err, users){
@@ -958,23 +960,23 @@ router.get('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 						var arr = {};
 						logs.forEach(function(log){
 							if(log.user_id == user.id){
-	//							if(log.date >= from && log.date <= to){
-										if(log.status[0].status == 'Present'){
-											present_count++;
-										}
-										if(log.status[0].status == 'Late'){
-											late_count++;
-										}
-										if(log.status[0].status == 'Absent'){
-											absent_count++;
-										}
-										if(log.status[0].status == 'Sick'){
-											sick_count++;
-										}
-										if(log.status[0].status == 'Vacation'){
-											vacation_count++;
-										}
-	//							}
+								if(log.date >= from && log.date <= to){
+									if(log.status[0].status == 'Present'){
+										present_count++;
+									}
+									if(log.status[0].status == 'Late'){
+										late_count++;
+									}
+									if(log.status[0].status == 'Absent'){
+										absent_count++;
+									}
+									if(log.status[0].status == 'Sick'){
+										sick_count++;
+									}
+									if(log.status[0].status == 'Vacation'){
+										vacation_count++;
+									}
+								}
 							}
 						});
 						var userid = user.id;
@@ -990,7 +992,9 @@ router.get('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 							user_id: req.params.id,
 							team: team,
 							logs: logs,
-							count: count
+							count: count,
+							from: from,
+							to: to
 						});
 					});
 				});
@@ -1002,11 +1006,11 @@ router.get('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 //get report
 router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 	Wuser.getUserById(req.params.id, function(err, wuser){
-		var month = moment().format('MM-')
-		var year = moment().format('-YYYY')
 		if(wuser.position == 'User'){
 			res.redirect('/'+req.params.team+'/'+req.params.id);
 		} else {
+			var month = moment().format('MM-')
+			var year = moment().format('-YYYY')
 			if(req.body.from_date){
 				var from = moment(req.body.from_date).format('MM-DD-YYYY');
 				if(req.body.to_date){
@@ -1036,23 +1040,21 @@ router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 							logs.forEach(function(log){
 								if(log.user_id == user.id){
 									if(log.date >= from && log.date <= to){
-										log.status.forEach(function(status){
-											if(status.status == 'Present'){
-												present_count++;
-											}
-											if(status.status == 'Late'){
-												late_count++;
-											}
-											if(status.status == 'Absent'){
-												absent_count++;
-											}
-											if(status.status == 'Sick'){
-												sick_count++;
-											}
-											if(status.status == 'Vacation'){
-												vacation_count++;
-											}
-										});
+										if(log.status[0].status == 'Present'){
+											present_count++;
+										}
+										if(log.status[0].status == 'Late'){
+											late_count++;
+										}
+										if(log.status[0].status == 'Absent'){
+											absent_count++;
+										}
+										if(log.status[0].status == 'Sick'){
+											sick_count++;
+										}
+										if(log.status[0].status == 'Vacation'){
+											vacation_count++;
+										}
 									}
 								}
 							});
@@ -1070,10 +1072,9 @@ router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 						var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation'];
 						var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation'];
 						var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});
-						fs.writeFile(__dirname+'/../report('+from+')to('+to+').csv', csv, function(err) {
+						fs.writeFile('report('+from+')to('+to+').csv', csv, function(err) {
 						  if (err) throw err;
 						});
-						console.log(__dirname+'/../report('+from+')to('+to+').csv');
 						res.render('report', {
 							page: 'report',
 							dates: moment().format('MM-DD-YYYY'),
@@ -1083,12 +1084,93 @@ router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 							user_id: req.params.id,
 							team: team,
 							logs: logs,
-							count: count
+							count: count,
+							from: from,
+							to: to
 						});
 					});
 				});
 			});
 		}
+	});
+});
+
+//download report
+router.post('/:team/:id/report/download', ensureAuthenticated, function(req,res,next){
+	var month = moment().format('MM-')
+	var year = moment().format('-YYYY')
+	if(req.body.from){
+		var from = moment(req.body.from).format('MM-DD-YYYY');
+		if(req.body.to){
+			var to = moment(req.body.to).format('MM-DD-YYYY');
+		} else {
+			var to = moment().format('MM-DD-YYYY');
+		}
+	} else {
+		var from = moment(month+'01'+year).format('MM-DD-YYYY');
+		if(req.body.to){
+			var to = moment(req.body.to).format('MM-DD-YYYY');
+		} else {
+			var to = moment().format('MM-DD-YYYY');
+		}
+	}
+	console.log(from+'   '+to)
+	var count = [];
+	Account.getAccountByTeam(req.params.team, function(err,team){
+		Wuser.getUsersByTeam(req.params.team, function(err, users){
+			Time.getTimeLogsByTeam(req.params.team, function(err,logs){
+				users.forEach(function(user){
+					var present_count = 0;
+					var late_count = 0;
+					var absent_count = 0;
+					var sick_count = 0;
+					var vacation_count = 0;
+					var arr = {};
+					logs.forEach(function(log){
+						if(log.user_id == user.id){
+							if(log.date >= from && log.date <= to){
+								if(log.status[0].status == 'Present'){
+									present_count++;
+								}
+								if(log.status[0].status == 'Late'){
+									late_count++;
+								}
+								if(log.status[0].status == 'Absent'){
+									absent_count++;
+								}
+								if(log.status[0].status == 'Sick'){
+									sick_count++;
+								}
+								if(log.status[0].status == 'Vacation'){
+									vacation_count++;
+								}
+							}
+						}
+					});
+					var userid = user.id;
+					var name = user.first_name + ' ' + user.last_name;
+					arr = {user_id: userid,
+						name: name,
+						present: present_count, 
+						late: late_count, 
+						absent: absent_count, 
+						sick: sick_count, 
+						vacation: vacation_count};
+					count.push(arr);
+				});
+				var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation'];
+				var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation'];
+				var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});console.log(csv);
+				fs.writeFile('report('+from+')to('+to+').csv', csv, function(err) {
+					if(err){
+						console.log(err);
+					}
+				});
+				res.setHeader('Content-disposition', 'attachment; filename=report('+from+')to('+to+').csv');
+				res.set('Content-Type', 'text/csv');
+				res.status(200).send(csv);
+			});
+		});
 	});
 });
 
