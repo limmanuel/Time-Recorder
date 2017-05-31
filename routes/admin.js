@@ -1097,25 +1097,9 @@ router.post('/:team/:id/report', ensureAuthenticated, function(req,res,next){
 
 //download report
 router.post('/:team/:id/report/download', ensureAuthenticated, function(req,res,next){
-	var month = moment().format('MM-')
-	var year = moment().format('-YYYY')
-	if(req.body.from){
-		var from = moment(req.body.from).format('MM-DD-YYYY');
-		if(req.body.to){
-			var to = moment(req.body.to).format('MM-DD-YYYY');
-		} else {
-			var to = moment().format('MM-DD-YYYY');
-		}
-	} else {
-		var from = moment(month+'01'+year).format('MM-DD-YYYY');
-		if(req.body.to){
-			var to = moment(req.body.to).format('MM-DD-YYYY');
-		} else {
-			var to = moment().format('MM-DD-YYYY');
-		}
-	}
-	console.log(from+'   '+to)
 	var count = [];
+	var from = moment(req.body.from).format('MM-DD-YYYY');
+	var to = moment(req.body.to).format('MM-DD-YYYY');
 	Account.getAccountByTeam(req.params.team, function(err,team){
 		Wuser.getUsersByTeam(req.params.team, function(err, users){
 			Time.getTimeLogsByTeam(req.params.team, function(err,logs){
@@ -1160,7 +1144,7 @@ router.post('/:team/:id/report/download', ensureAuthenticated, function(req,res,
 				});
 				var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation'];
 				var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation'];
-				var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});console.log(csv);
+				var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});
 				fs.writeFile('report('+from+')to('+to+').csv', csv, function(err) {
 					if(err){
 						console.log(err);
