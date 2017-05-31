@@ -198,8 +198,7 @@ router.get('/login', function(req,res,next){
 								var time = moment().format('HH:MM:ss');
 								if(time >= sched){
 									Time.getTimeLogsByUserAndDate(userid, moment().format('MM-DD-YYYY'), function(err, user){
-										if(user.timein[0]){
-											if(user.timein[0].timein !== 'N/A'){
+											if(user.timein[0].timein){} else{
 												let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': 'Absent'};
 												var timein = {
 													timein: "N/A",
