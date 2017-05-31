@@ -3,7 +3,7 @@
 <div class="row">
 <h3> Manage Users</h3>
 	<div class="col s10 offset-s1">
-	<table class="responsive-table striped col m12">
+	<table class="striped col m12">
 		<tr>
 			<th></th>
 			<th>Name</th>
@@ -80,22 +80,22 @@
 </div>
 
 <div id="Account" class="col s12">
-<div class="row">
+<div class="row col s12">
 	<h3>Account Settings</h3>
-	<div class="form-group col s5"><br>
+	<div class="form-group col l4 m4 s12"><br>
 		<label> Team: </label>
 		<input class="form-control" type="text" name="team" placeholder="Team" value="{{team.team}}" readonly>
-	</div>Schedule:
-	<div class="col s7 row">
-		<div class="form-group col s4">
+	</div>Schedule:<br>
+	<div class="col l7	 m8 s12 row">
+		<div class="form-group col m5 s6">
 			<label> Time In: </label>
 			<input class="form-control" type="time" name="sched_in" value="{{team.sched_in}}" readonly>
 		</div>
-		<div class="form-group col s4">
+		<div class="form-group col m5 s6">
 			<label> Time Out: </label>
 			<input class="form-control" type="time" name="sched_out" value="{{team.sched_out}}" readonly>
 		</div>
-		<div class="col s3 offset-s1"><br>
+		<div class="col m2 s12">
 			{{#equal wuser.position 'Owner'}}
 				<button type="submit" class="waves-effect waves-light btn-flat col s12" data-target="Account_Settings">Edit</button>
 				<div id="Account_Settings" class="modal">
@@ -125,9 +125,9 @@
 		</div>
 	</div>
 </div>
-<div class="row">
+<div class="row col s12">
 <h3>Holidays</h3>
-	<table class="table-responsive bordered">
+	<table class="bordered">
 		<tr>
 			<th>Holiday</th>
 			<th>Date</th>
@@ -145,8 +145,8 @@
 							<h6>Do you want to cancel this form?</h6>
 						</div>
 						<div class="modal-footer">
-								<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
-								<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+								<button type="submit" class="waves-effect waves-light btn col s6 modal-action modal-close">Confirm</button>
+								<a type="button" href="#!" class="waves-effect waves-light btn col s6 red modal-close">Cancel</a>
 						</div>
 					</form>
 					</div>
@@ -158,19 +158,18 @@
 	<div id="Add_Holiday" class="modal">
 		<form method="post" action="/{{team.team}}/{{user_id}}/admin/settings/holiday/add">
 			<div class="modal-content">
-				<div class="form-group col s6">
+				<div class="form-group col m6 s12">
 					<label> Holiday: </label>
 					<input class="form-control" type="text" name="holiday_name" placeholder="Holiday Name">
 				</div>
-				<div class="form-group col s6">
+				<div class="form-group col m6 s12">
 					<label>Date: </label>
-					<input id="datepicker" class="form-control" type="text" name="holiday_date" placeholder="Select Date MM-DD-YYYY">
+					<input class="form-control" type="date" name="holiday_date">
 				</div>
-				<div><br><br><br><br><br><br><br><br><br><br><br><br></div>
 			</div>
 			<div class="modal-footer">
-					<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
-					<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					<button type="submit" class="waves-effect waves-light btn col s6 modal-action modal-close">Confirm</button>
+					<a type="button" href="#!" class="waves-effect waves-light btn col s6 red modal-close">Cancel</a>
 			</div>
 		</form>
 	</div>

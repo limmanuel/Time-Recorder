@@ -1,7 +1,7 @@
 
 <div class="row">
 <div id="Home" class="col s12 row">
-	<div class="col xl8 l12">
+	<div class="col xl8 l12 hide-on-small-and-down">
 		<div class="grey darken-3 card horizontal profile">
 			<div class="card-image waves-effect waves-light tooltipped" data-position="left" data-delay="50" data-tooltip="Change your profile picture" data-target="img" style="border-radius: 7px; width: 240px; height: 240px; overflow:hidden">
 				<img src="{{user.img}}">
@@ -71,7 +71,77 @@
 			</div>
 		</div>
 	</div>
-	<div class="col xl4 s6 offset-s3"><br><br>
+	<div class="col xl8 l12 hide-on-med-and-up">
+		<div class="grey darken-3 card small_profile">
+			<div class="card-image waves-effect waves-light tooltipped" data-position="left" data-delay="50" data-tooltip="Change your profile picture" data-target="img" style="margin:5px; border-radius: 7px; width: 100% -10px; overflow:hidden">
+				<img src="{{user.img}}">
+			</div>
+			<div id="img" class="modal ">
+				<form method="post" action="/{{team.team}}/{{user_id}}/image">
+					<div class="modal-content">
+						<div style="height: 200px; width: 200px; overflow:hidden">
+							<img src="{{user.img}}" width="100%">
+						</div>
+						<label>Link:</label>
+						<input name="image" type="text" value="{{user.img}}">
+					</div>
+					<div class="modal-footer">
+							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
+							<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					</div>
+				</form>
+			</div>
+			<div class="card-stacked col" style="margin-top: 0px">
+					<p class="col waves-effect waves-light s12 cyan float" >
+						<b>Name:</b> {{user.first_name}} {{user.last_name}}<br>
+						<b>Email:</b> {{user.email}} <br>
+						<b>Position:</b> {{user.position}}
+					</p>
+					<p class="col s12 waves-effect waves-light blue" style="margin-top: -15px;">
+						<b>Time In: </b>
+						{{#each log.timein}}
+							{{#equal (addOne @index) ../log.timein.length}}
+								{{#equal timein 'N/A'}}
+									{{timein}}
+								{{else}}
+									{{moment (add ../dates timein) 'hh:mm:ss A'}}
+								{{/equal}}
+							{{/equal}}
+						{{/each}}<br>
+						<b>Time Out: </b>
+						{{#each log.timeout}}
+							{{#equal (addOne @index) ../log.timein.length}}
+								{{#equal timeout 'N/A'}}
+									{{timeout}}
+								{{else}}
+									{{moment (add ../dates timeout) 'hh:mm:ss A'}}
+								{{/equal}}
+							{{/equal}}
+						{{/each}}
+					</p>
+		{{#each log.status}}
+			{{#equal (addOne @index) ../log.status.length}}
+				{{#equal status 'Present'}}
+					<p id="status" class="waves-effect waves-light btn-large col s12 blue" style="margin-top: -10px;">Present</p>
+				{{/equal}}
+				{{#equal status 'Late'}}
+					<p id="status" class="waves-effect waves-light btn-large col s12 orange" style="margin-top: -10px;">Late</p>
+				{{/equal}}
+				{{#equal status 'Sick'}}
+					<p id="status" class="waves-effect waves-light btn-large col s12 green" style="margin-top: -10px;">Sick</p>
+				{{/equal}}
+				{{#equal status 'Vacation'}}
+					<p id="status" class="waves-effect waves-light btn-large col s12 red" style="margin-top: -10px;">Vacation</p>
+				{{/equal}}
+				{{#equal status 'Absent'}}
+					<p id="status" class="waves-effect waves-light btn-large col s12 grey" style="margin-top: -10px;">Absent</p>
+				{{/equal}}
+			{{/equal}}
+		{{/each}}
+			</div>
+		</div>
+	</div>
+	<div class="col xl4 m6 offset-m3 s12"><br><br>
 		<div id="in_out">
 		{{#greater log.timein.length log.timeout.length}}
 			<form method="post" action="/{{team.team}}/{{user_id}}/timeout/{{dates}}/{{time}}">
@@ -126,7 +196,7 @@
 
 <div id="History" class="col s12">
 	<form method="post" action="/{{team.team}}/{{user_id}}/filter" class="row">
-		<div class="form-group col m3 s5">
+		<div class="form-group col l3 m5 s6">
 			<select multiple name="filterMonth">
 				<option disabled selected>Select Month</option>
 				<option value="01">January</option>
@@ -143,7 +213,7 @@
 				<option value="12">December</option>
 			</select>
 		</div>
-		<div class="form-group col m3 s5">
+		<div class="form-group col l3 m5 s6">
 			<select multiple name="filterStatus">
 				<option disabled selected>Select Status</option>
 				<option value="Absent">Absent</option>
@@ -154,9 +224,9 @@
 				<option value="Holiday">Holiday</option>
 			</select>
 		</div>
-		<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col l2 m3 s2">Filter</button>
+		<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col l2 m2 s12">Filter</button>
 	</form>
-	<table class="responsive-table bordered col m12">
+	<table class="bordered col s12">
 		<tr>
 			<th>Date</th>
 			<th>Time In</th>
@@ -244,14 +314,14 @@
 			<td>{{leave_status}}</td>
 			<td>
 				<button class="btn red waves-effect waves-light delete-form" data-target="form{{_id}}">Cancel</button>
-				<div id="form{{_id}}" class="modal">
+				<div id="form{{_id}}" class="modal s2">
 				<form method="post" action="/{{../team.team}}/{{../user_id}}/leave/form/delete/{{_id}}">
 					<div class="modal-content center-align">
 						<h6>Do you want to cancel this form?</h6>
 					</div>
 					<div class="modal-footer">
-							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
-							<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+							<button type="submit" class="waves-effect waves-light btn col s6 modal-action modal-close">Confirm</button>
+							<a type="button" href="#!" class="waves-effect waves-light btn col s6 red modal-close">Cancel</a>
 					</div>
 				</form>
 				</div>
@@ -266,7 +336,7 @@
 <h3> Update a User </h3>
 	<div class="col s10 offset-s1">
 		<form method="post" action="/{{team.team}}/{{user_id}}">
-			<div class="col s6">
+			<div class="col l6 m8 offset-m2 s12">
 				<div class="form-group">
 					<label> First Name: </label>
 					<input class="form-control" type="text" name="fname" placeholder="First Name" value="{{user.first_name}}">
@@ -284,7 +354,7 @@
 					<input class="form-control" type="text" name="image" placeholder="Image Link" value="{{user.img}}">
 				</div>
 			</div>
-			<div class="col s6">
+			<div class="col l6 m8 offset-m2 s12">
 				<div class="form-group">
 					<label> Username: </label>
 					<input class="form-control" type="text" name="username" placeholder="Username" value="{{user.username}}">

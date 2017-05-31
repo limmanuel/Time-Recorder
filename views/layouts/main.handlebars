@@ -51,8 +51,10 @@
 				{{else}}
 					<li class="tab"><a href="#Settings">Settings</a></li>
 				{{/equal}}
-					<li class="tab disabled right"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
-					<li class="tab disabled right"><a href="#">Schedule: </a></li>
+				<div class="right hide-on-small-and-down">
+					<li class="tab disabled"><a href="#">Schedule: </a></li>
+					<li class="tab disabled"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
+				</div>
 				</ul>
 				{{/equal}}
 		      	{{#equal page 'dashboard'}}
@@ -76,8 +78,10 @@
 						<li class="tab"><a href="#Form">Form</a></li>
 					{{/equal}}
 				{{/equal}}
-						<li class="tab disabled right"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
-						<li class="tab disabled right"><a href="#">Schedule: </a></li>
+					<div class="right hide-on-small-and-down">
+						<li class="tab disabled"><a href="#">Schedule: </a></li>
+						<li class="tab disabled"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
+					</div>
 					</ul>
 				{{/equal}}
 		      	{{#equal page 'admin'}}
@@ -92,8 +96,10 @@
 					{{else}}
 						<li class="tab"><a href="#Account">Account Settings</a></li>
 					{{/equal}}
-						<li class="tab disabled right"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
-						<li class="tab disabled right"><a href="#">Schedule: </a></li>
+						<div class="right hide-on-small-and-down">
+							<li class="tab disabled"><a href="#">Schedule: </a></li>
+							<li class="tab disabled"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
+						</div>
 					</ul>
 				{{/equal}}
 		    </nav>

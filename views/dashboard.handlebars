@@ -57,8 +57,8 @@
 	</div>
 </div>
 
-<div class="grey darken-3 modal row" id="{{id}}">
-	<div class="grey darken-3 card horizontal profiles col s12">
+<div class="grey darken-3 modal row " id="{{id}}">
+	<div class="grey darken-3 card horizontal profiles col s12 hide-on-small-and-down">
 		<div class="card-image waves-effect waves-light" data-target="img" style="border-radius: 7px; width: 240px; height: 240px; overflow:hidden">
 			<img src="{{img}}">
 		</div>
@@ -68,7 +68,7 @@
 					<b>Email:</b> {{email}} <br>
 					<b>Position:</b> {{position}}
 				</p>
-				<p class="col m12 waves-effect waves-light blue" style="margin-top: -15px;">
+				<p class="col s12 waves-effect waves-light blue" style="margin-top: -15px;">
 					<b>Time In: </b>
 			{{#each ../log}}
 				{{#equal user_id ../id}}
@@ -103,19 +103,84 @@
 				{{#each status}}
 					{{#equal (addOne @index) ../status.length}}
 						{{#equal status 'Present'}}
-							<p id="status" class="waves-effect waves-light btn-large col m12 blue" style="margin-top: -10px;">Present</p>
+							<p id="status" class="waves-effect waves-light btn-large col s12 blue" style="margin-top: -10px;">Present</p>
 						{{/equal}}
 						{{#equal status 'Late'}}
-							<p id="status" class="waves-effect waves-light btn-large col m12 orange" style="margin-top: -10px;">Late</p>
+							<p id="status" class="waves-effect waves-light btn-large col s12 orange" style="margin-top: -10px;">Late</p>
 						{{/equal}}
 						{{#equal status 'Sick'}}
-							<p id="status" class="waves-effect waves-light btn-large col m12 green" style="margin-top: -10px;">Sick</p>
+							<p id="status" class="waves-effect waves-light btn-large col s12 green" style="margin-top: -10px;">Sick</p>
 						{{/equal}}
 						{{#equal status 'Vacation'}}
-							<p id="status" class="waves-effect waves-light btn-large col m12 red" style="margin-top: -10px;">Vacation</p>
+							<p id="status" class="waves-effect waves-light btn-large col s12 red" style="margin-top: -10px;">Vacation</p>
 						{{/equal}}
 						{{#equal status 'Absent'}}
-							<p id="status" class="waves-effect waves-light btn-large col m12 grey" style="margin-top: -10px;">Absent</p>
+							<p id="status" class="waves-effect waves-light btn-large col s12 grey" style="margin-top: -10px;">Absent</p>
+						{{/equal}}
+					{{/equal}}
+				{{/each}}
+			{{/equal}}
+		{{/each}}
+		</div>
+	</div>
+	<div class="grey darken-3 card small_profiles hide-on-med-and-up">
+		<div class="card-image waves-effect waves-light" style="margin:5px; border-radius: 7px; width: 100% -10px; overflow:hidden">
+			<img src="{{img}}">
+		</div>
+		<div class="card-stacked col" style="margin-top: 0px">
+				<p class="col waves-effect waves-light s12 cyan float" >
+					<b>Name:</b> {{first_name}} {{last_name}}<br>
+					<b>Email:</b> {{email}} <br>
+					<b>Position:</b> {{position}}
+				</p>
+				<p class="col s12 waves-effect waves-light blue" style="margin-top: -15px;">
+					<b>Time In: </b>
+			{{#each ../log}}
+				{{#equal user_id ../id}}
+					{{#each timein}}
+						{{#equal (addOne @index) ../timein.length}}
+							{{#equal timein 'N/A'}}
+								{{timein}}
+							{{else}}
+								{{moment (add ../../../dates timein) 'hh:mm:ss A'}}
+							{{/equal}}
+						{{/equal}}
+					{{/each}}
+				{{/equal}}
+			{{/each}}<br>
+					<b>Time Out: </b>
+			{{#each ../log}}
+				{{#equal user_id ../id}}
+					{{#each log.timeout}}
+						{{#equal (addOne @index) ../timein.length}}
+							{{#equal timeout 'N/A'}}
+								{{timeout}}
+							{{else}}
+								{{moment (add ../../../dates timeout) 'hh:mm:ss A'}}
+							{{/equal}}
+						{{/equal}}
+					{{/each}}
+				{{/equal}}
+			{{/each}}
+				</p>
+		{{#each ../log}}
+			{{#equal user_id ../id}}
+				{{#each status}}
+					{{#equal (addOne @index) ../status.length}}
+						{{#equal status 'Present'}}
+							<p id="status" class="waves-effect waves-light btn-large col s12 blue" style="margin-top: -10px;">Present</p>
+						{{/equal}}
+						{{#equal status 'Late'}}
+							<p id="status" class="waves-effect waves-light btn-large col s12 orange" style="margin-top: -10px;">Late</p>
+						{{/equal}}
+						{{#equal status 'Sick'}}
+							<p id="status" class="waves-effect waves-light btn-large col s12 green" style="margin-top: -10px;">Sick</p>
+						{{/equal}}
+						{{#equal status 'Vacation'}}
+							<p id="status" class="waves-effect waves-light btn-large col s12 red" style="margin-top: -10px;">Vacation</p>
+						{{/equal}}
+						{{#equal status 'Absent'}}
+							<p id="status" class="waves-effect waves-light btn-large col s12 grey" style="margin-top: -10px;">Absent</p>
 						{{/equal}}
 					{{/equal}}
 				{{/each}}
@@ -130,7 +195,7 @@
 </div>
 <div id="History" class="col l10 offset-l1 container">
 <form method="post" action="/{{team.team}}/{{user_id}}/dashboard/filter" class="row">
-	<div class="form-group col m3 s5">
+		<div class="form-group col l3 m5 s6">
 		<select multiple name="filterMonth">
 			<option disabled selected>Select Month</option>
 			<option value="01">January</option>
@@ -147,7 +212,7 @@
 			<option value="12">December</option>
 		</select>
 	</div>
-	<div class="form-group col m3 s5">
+	<div class="form-group col l3 m5 s6">
 		<select multiple name="filterStatus">
 			<option disabled selected>Select Status</option>
 			<option value="Absent">Absent</option>
@@ -158,9 +223,9 @@
 			<option value="Holiday">Holiday</option>
 		</select>
 	</div>
-	<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col l2 m3 s2">Filter</button>
+	<button type="submit" id="filter" class="waves-effect waves-light btn-large btn-flat col l2 m2 s12">Filter</button>
 </form>
-<table class="responsive-table bordered col m12">
+<table class="responsive-table bordered col s12">
 	<tr>
 		<th>Name</th>
 		<th>Date</th>
