@@ -1,4 +1,6 @@
-p {
+option{
+  font-size: 9px !important;
+}p {
 	color: white;
 	border-radius: 3px;
 	margin-top: 5px;
