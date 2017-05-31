@@ -198,18 +198,20 @@ router.get('/login', function(req,res,next){
 								var time = moment().format('HH:MM:ss');
 								if(time >= sched){
 									Time.getTimeLogsByUserAndDate(userid, moment().format('MM-DD-YYYY'), function(err, user){
-										if(user.timein[0].timein !== 'N/A'){
-											let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': 'Absent'};
-											var timein = {
-												timein: "N/A",
-												date: moment().format('MM-DD-YYYY')
+										if(user.timein[0]){
+											if(user.timein[0].timein !== 'N/A'){
+												let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': 'Absent'};
+												var timein = {
+													timein: "N/A",
+													date: moment().format('MM-DD-YYYY')
+												}
+												var timeout = {
+													timeout: "N/A",
+													date: moment().format('MM-DD-YYYY')
+												}
+												Time.addTimeIn(query, timein, function(err, tin){});
+												Time.addTimeOut(query, timeout, function(err, tout){});
 											}
-											var timeout = {
-												timeout: "N/A",
-												date: moment().format('MM-DD-YYYY')
-											}
-											Time.addTimeIn(query, timein, function(err, tin){});
-											Time.addTimeOut(query, timeout, function(err, tout){});
 										}
 									});
 								}
