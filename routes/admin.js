@@ -401,7 +401,7 @@ router.post('/:team/:id/timein/:dates/:tin', ensureAuthenticated,  function(req,
 		let query = {user_id: req.params.id, date: req.params.dates};
 		let status_query = {user_id: req.params.id, date: req.params.dates, 'status.status': 'Absent'};
 		var timein = moment().format('HH:mm:ss');
-		var sched = moment(req.body.sched_in).add(1,'m');
+		var sched = moment(req.params.dates + ' ' +req.body.sched_in).add(1,'m').format('HH:mm:ss');
 		var time = {
 			timein: timein
 		}

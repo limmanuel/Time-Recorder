@@ -20,8 +20,16 @@
 		        <i class="material-icons">menu</i></a>
 		          <ul id="nav-mobile" class="right hide-on-med-and-down">
 		          	{{#if wuser}}
-            			<li><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
-				    	<li><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
+		          		{{#equal page 'profile'}}
+	            			<li class="active"><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
+	            		{{else}}
+	            			<li><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
+	            		{{/equal}}
+	            		{{#equal page 'dashboard'}}
+					    	<li class="active"><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
+						{{else}}
+					    	<li><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
+					    {{/equal}}
 				    	<li><a href="/logout">Logout</a></li>
 		          	{{else}}
 		            	<li><a href="/login">Login</a></li>
