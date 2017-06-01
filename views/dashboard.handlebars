@@ -19,14 +19,14 @@
 									{{../../first_name}} {{../../last_name}}<br>
 									{{../../email}} <br>
 									{{../../position}}<br>
-									{{status}}</p>
+									{{status}}{{#if ../timein}} - {{moment (add ../date ../timein.0.timein) 'hh:mm A'}}{{/if}}</p>
 							{{/equal}}
 							{{#equal status 'Late'}}
 								<p id="status" class="waves-effect waves-light col m12 orange darken-2 dashboard">
 									{{../../first_name}} {{../../last_name}}<br>
 									{{../../email}} <br>
 									{{../../position}}<br>
-									{{status}}</p>
+									{{status}}{{#if ../timein}} - {{moment (add ../date ../timein.0.timein) 'hh:mm A'}}{{/if}}</p>
 							{{/equal}}
 							{{#equal status 'Sick'}}
 								<p id="status" class="waves-effect waves-light col m12 green darken-2 dashboard">
@@ -230,6 +230,8 @@
 		<th>Name</th>
 		<th>Date</th>
 		<th>Time In</th>
+		<th>Start Break</th>
+		<th>End Break</th>
 		<th>Time Out</th>
 		<th>Status</th>
 		<th>Duration</th>
@@ -249,34 +251,76 @@
 											{{moment ../../../date 'MMM DD YYYY'}}
 										</td>
 										<td>
-											{{#if ../../../timein.0.timein}}
-												{{#equal ../../../timein.0.timein 'N/A'}}
-													{{../../../timein.0.timein}}
-												{{else}}
-													{{moment (add ../../../date ../../../timein.0.timein) 'hh:mm:ss A'}}
-												{{/equal}}
-											{{/if}}
+											{{#each ../../../timein}}
+													{{#equal timein 'N/A'}}
+														{{timein}}
+													{{else}}
+														{{moment (add ../../../../date timein) 'hh:mm:ss A'}}<br>
+													{{/equal}}
+											{{/each}}
 										</td>
 										<td>
-											{{var 't' (lastArr ../../../timeout)}}
-											{{#if t}}
-												{{#equal t.timeout 'N/A'}}
-													{{t.timeout}}
+											{{#each ../../../breakin}}
+													{{#equal breakin 'N/A'}}
+														{{breakin}}
+													{{else}}
+														{{moment (add ../../../../date breakin) 'hh:mm:ss A'}}<br>
+													{{/equal}}
+											{{/each}}
+										</td>
+										<td>
+											{{#each ../../../breakout}}
+													{{#equal breakout 'N/A'}}
+														{{breakout}}
+													{{else}}
+														{{moment (add ../../../../date breakout) 'hh:mm:ss A'}}<br>
+													{{/equal}}
+											{{/each}}
+										</td>
+										<td>
+											{{#each ../../../timeout}}
+												{{#equal timeout 'N/A'}}
+													{{timeout}}
 												{{else}}
-													{{moment (add ../../../date t.timeout) 'hh:mm:ss A'}}
+													{{moment (add ../../../../date timeout) 'hh:mm:ss A'}}<br>
 												{{/equal}}
-											{{/if}}
+											{{/each}}
 										</td>
 										<td>
 											{{../../../status.0.status}}
 										</td>
 										<td>
-											{{#if t}}
-												{{#equal ../../../timein.0.timein 'N/A'}}
-												{{else}}
-													{{duration t.timeout ../../../timein.0.timein}}
-												{{/equal}}
-											{{/if}}
+											{{#each ../../../timeout}}
+												{{#each ../../../../breakout}}
+													{{#equal @../index @index}}
+														{{#each ../../../../../breakin}}
+															{{#equal @../index @index}}
+																{{#each ../../../../../../timein}}
+																	{{#equal @../index @index}}
+																		{{var 'tout' ../../../timeout}}
+																		{{var 'bout' ../../breakout}}
+																		{{var 'bin' ../breakin}}
+																		{{var 'tin' timein}}
+																		{{var 'sta' ../../../../../../../status.0.status}}
+																		{{#equal sta 'Present'}}
+																			{{#equal tin 'N/A'}}
+																			{{else}}
+																				{{hours_spent tin bin bout tout}}<br>
+																			{{/equal}}
+																		{{/equal}}
+																		{{#equal sta 'Late'}}
+																			{{#equal tin 'N/A'}}
+																			{{else}}
+																				{{hours_spent tin bin bout tout}}<br>
+																			{{/equal}}
+																		{{/equal}}
+																	{{/equal}}
+																{{/each}}
+															{{/equal}}
+														{{/each}}
+													{{/equal}}
+												{{/each}}
+											{{/each}}
 										</td>
 									</tr>
 								{{/equal}}

@@ -122,11 +122,23 @@ Handlebars.registerHelper('lastArr', function(array, context){
 Handlebars.registerHelper('addOne', function(num, options){
   return num+=1;
 })
+Handlebars.registerHelper('subOne', function(num, options){
+  return num-=1;
+})
 Handlebars.registerHelper('add', function(left, right, options){
   return left + ' ' + right;
 })
 Handlebars.registerHelper('duration', function (timeout, timein, options){
   var ms = moment(timeout,"HH:mm:ss").diff(moment(timein,"HH:mm:ss"));
+  var d = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+  if(d!=='00s'){
+    return d
+  }
+});
+Handlebars.registerHelper('hours_spent', function (timein, breakin, breakout, timeout, options){
+  var msin = moment(breakin,"HH:mm:ss").diff(moment(timein,"HH:mm:ss"));
+  var msout = moment(timeout,"HH:mm:ss").diff(moment(breakout,"HH:mm:ss"));
+  var ms = msin + msout;
   var d = moment.duration(ms).format("HH[h] mm[m] ss[s]");
   if(d!=='00s'){
     return d

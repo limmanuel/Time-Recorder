@@ -48,6 +48,14 @@ module.exports.delLeave = function(query, callback){
 	Request.deleteOne(query, callback);
 }
 
+module.exports.updateLeave = function(query, status, callback){
+	Request.update(query, {
+		$set:{
+			leave_status: status
+		}
+	}, callback);
+}
+
 module.exports.deleteUser = function(query, callback){
 	Request.delete(query,callback);
 }

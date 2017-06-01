@@ -24,6 +24,16 @@ var timelogSchema = new mongoose.Schema({
 			type: String
 		}
 	}],
+	breakin: [{
+		breakin: {
+			type: String
+		}
+	}],
+	breakout: [{
+		breakout: {
+			type: String
+		}
+	}],
 	status: [{
 		status: {
 			type: String
@@ -68,6 +78,26 @@ module.exports.addTimeOut = function(query, time, callback){
 	{
 		$push:{
 			timeout: time
+		}
+	},
+	 callback);
+}
+
+module.exports.addBreakIn = function(query, time, callback){
+		TimeLog.update(query,
+	{
+		$push:{
+			breakin: time
+		}
+	},
+	 callback);
+}
+
+module.exports.addBreakOut = function(query, time, callback){
+		TimeLog.update(query,
+	{
+		$push:{
+			breakout: time
 		}
 	},
 	 callback);
