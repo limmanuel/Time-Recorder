@@ -24,6 +24,9 @@ var wuserSchema = mongoose.Schema({
 	password: {
 		type: String
 	},
+	department: {
+		type:String
+	},
 	position: {
 		type: String
 	}

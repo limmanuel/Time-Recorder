@@ -33,6 +33,7 @@ function updateClock() {
     document.getElementById("clock").innerHTML = currentTimeString;
 }
 $(document).ready(function(){
+    $('ul.tabs').tabs();
 	$('.modal').modal();
     $('select').material_select();
     $('.button-collapse').sideNav({

@@ -1,8 +1,11 @@
 </div>
 <div class="row">
-<div class="row">
 <div id="Home" class="col s12">
-{{#each user}}
+{{#each team.departments}}
+<div class="row">
+	<h5>{{department}}</h5>
+{{#each ../user}}
+{{#ifCond department '==' ../department}}
 <div class="col xl3 l4 m6 s12">
 <div class="card horizontal badge tooltipped" data-target="{{id}}" data-delay="50" data-tooltip="Click to view profile" >
 	<div class="card-image" style="border-radius: 5px 0px 0px 5px; width: 100px; height: 100px; overflow:hidden">
@@ -10,7 +13,7 @@
 	</div>
 	<div class="card-stacked">
 		<div class="card-content"><b>
-			{{#each ../log}}
+			{{#each ../../log}}
 				{{#equal user_id ../id}}
 					{{#each status}}
 						{{#equal (addOne @index) ../status.length}}
@@ -70,7 +73,7 @@
 				</p>
 				<p class="col s12 waves-effect waves-light blue" style="margin-top: -15px;">
 					<b>Time In: </b>
-			{{#each ../log}}
+			{{#each ../../log}}
 				{{#equal user_id ../id}}
 					{{#each timein}}
 						{{#equal (addOne @index) ../timein.length}}
@@ -84,7 +87,7 @@
 				{{/equal}}
 			{{/each}}<br>
 					<b>Time Out: </b>
-			{{#each ../log}}
+			{{#each ../../log}}
 				{{#equal user_id ../id}}
 					{{#each log.timeout}}
 						{{#equal (addOne @index) ../timein.length}}
@@ -98,7 +101,7 @@
 				{{/equal}}
 			{{/each}}
 				</p>
-		{{#each ../log}}
+		{{#each ../../log}}
 			{{#equal user_id ../id}}
 				{{#each status}}
 					{{#equal (addOne @index) ../status.length}}
@@ -135,7 +138,7 @@
 				</p>
 				<p class="col s12 waves-effect waves-light blue" style="margin-top: -15px;">
 					<b>Time In: </b>
-			{{#each ../log}}
+			{{#each ../../log}}
 				{{#equal user_id ../id}}
 					{{#each timein}}
 						{{#equal (addOne @index) ../timein.length}}
@@ -149,7 +152,7 @@
 				{{/equal}}
 			{{/each}}<br>
 					<b>Time Out: </b>
-			{{#each ../log}}
+			{{#each ../../log}}
 				{{#equal user_id ../id}}
 					{{#each log.timeout}}
 						{{#equal (addOne @index) ../timein.length}}
@@ -163,7 +166,7 @@
 				{{/equal}}
 			{{/each}}
 				</p>
-		{{#each ../log}}
+		{{#each ../../log}}
 			{{#equal user_id ../id}}
 				{{#each status}}
 					{{#equal (addOne @index) ../status.length}}
@@ -190,11 +193,13 @@
 	</div>
 </div>
 </div>
+{{/ifCond}}
 {{/each}}
 </div>
+{{/each}}
 </div>
 <div id="History" class="col l10 offset-l1 container">
-<form method="post" action="/{{team.team}}/{{user_id}}/dashboard/filter" class="row">
+<form method="post" action="/dashboard/filter" class="row">
 		<div class="form-group col l3 m5 s6">
 		<select multiple name="filterMonth">
 			<option disabled selected>Select Month</option>
@@ -239,94 +244,70 @@
 {{#each logs}}
 	{{#each ../user}}
 		{{#equal id ../user_id}}
-					{{#each ../../filterMonth}}
-						{{#equal this (moment ../date 'MM')}}
-							{{#each ../../../filterStatus}}
-								{{#equal this ../../../status.0.status}}
-									<tr>
-										<td>
-											{{../../first_name}} {{../../last_name}}
-										</td>
-										<td>
-											{{moment ../../../date 'MMM DD YYYY'}}
-										</td>
-										<td>
-											{{#each ../../../timein}}
-													{{#equal timein 'N/A'}}
-														{{timein}}
-													{{else}}
-														{{moment (add ../../../../date timein) 'hh:mm:ss A'}}<br>
-													{{/equal}}
-											{{/each}}
-										</td>
-										<td>
-											{{#each ../../../breakin}}
-													{{#equal breakin 'N/A'}}
-														{{breakin}}
-													{{else}}
-														{{moment (add ../../../../date breakin) 'hh:mm:ss A'}}<br>
-													{{/equal}}
-											{{/each}}
-										</td>
-										<td>
-											{{#each ../../../breakout}}
-													{{#equal breakout 'N/A'}}
-														{{breakout}}
-													{{else}}
-														{{moment (add ../../../../date breakout) 'hh:mm:ss A'}}<br>
-													{{/equal}}
-											{{/each}}
-										</td>
-										<td>
-											{{#each ../../../timeout}}
-												{{#equal timeout 'N/A'}}
-													{{timeout}}
-												{{else}}
-													{{moment (add ../../../../date timeout) 'hh:mm:ss A'}}<br>
-												{{/equal}}
-											{{/each}}
-										</td>
-										<td>
-											{{../../../status.0.status}}
-										</td>
-										<td>
-											{{#each ../../../timeout}}
-												{{#each ../../../../breakout}}
-													{{#equal @../index @index}}
-														{{#each ../../../../../breakin}}
-															{{#equal @../index @index}}
-																{{#each ../../../../../../timein}}
-																	{{#equal @../index @index}}
-																		{{var 'tout' ../../../timeout}}
-																		{{var 'bout' ../../breakout}}
-																		{{var 'bin' ../breakin}}
-																		{{var 'tin' timein}}
-																		{{var 'sta' ../../../../../../../status.0.status}}
-																		{{#equal sta 'Present'}}
-																			{{#equal tin 'N/A'}}
-																			{{else}}
-																				{{hours_spent tin bin bout tout}}<br>
-																			{{/equal}}
-																		{{/equal}}
-																		{{#equal sta 'Late'}}
-																			{{#equal tin 'N/A'}}
-																			{{else}}
-																				{{hours_spent tin bin bout tout}}<br>
-																			{{/equal}}
-																		{{/equal}}
-																	{{/equal}}
-																{{/each}}
-															{{/equal}}
-														{{/each}}
-													{{/equal}}
-												{{/each}}
-											{{/each}}
-										</td>
-									</tr>
-								{{/equal}}
-							{{/each}}
+			{{#each ../../filterMonth}}
+				{{#equal this (moment ../date 'MM')}}
+					{{#each ../../../filterStatus}}
+						{{#equal this ../../../status.0.status}}
+							<tr>
+								<td>
+									{{../../first_name}} {{../../last_name}}
+								</td>
+								<td>
+									{{moment ../../../date 'MMM DD YYYY'}}
+								</td>
+								<td>
+									{{#each ../../../timein}}
+											{{#equal timein 'N/A'}}
+												{{timein}}
+											{{else}}
+												{{moment (add ../../../../date timein) 'hh:mm:ss A'}}<br>
+											{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{#each ../../../breakin}}
+											{{#equal breakin 'N/A'}}
+												{{breakin}}
+											{{else}}
+												{{moment (add ../../../../date breakin) 'hh:mm:ss A'}}<br>
+											{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{#each ../../../breakout}}
+											{{#equal breakout 'N/A'}}
+												{{breakout}}
+											{{else}}
+												{{moment (add ../../../../date breakout) 'hh:mm:ss A'}}<br>
+											{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{#each ../../../timeout}}
+										{{#equal timeout 'N/A'}}
+											{{timeout}}
+										{{else}}
+											{{moment (add ../../../../date timeout) 'hh:mm:ss A'}}<br>
+										{{/equal}}
+									{{/each}}
+								</td>
+								<td>
+									{{../../../status.0.status}}
+								</td>
+								<td>
+									{{#each ../../../../hours_spent}}
+										{{#ifCond name '==' ../../../../name}}
+											{{#ifCond date '==' ../../../../date}}
+												{{hours}}
+											{{/ifCond}}
+										{{/ifCond}}
+									{{/each}}
+								</td>
+							</tr>
 						{{/equal}}
 					{{/each}}
+				{{/equal}}
+			{{/each}}
 		{{/equal}}
 	{{/each}}
 {{/each}}
@@ -356,7 +337,7 @@
 					<button class="btn blue waves-effect waves-light delete-form" data-target="form{{_id}}">Update</button>
 				</td>
 				<div id="form{{_id}}" class="modal modal-fixed-footer">
-					<form method="post" action="/{{../../team.team}}/{{../../user_id}}/dashboard/leave/form/{{user_id}}/update/{{_id}}">
+					<form method="post" action="/dashboard/leave/form/update/{{_id}}">
 						<div class="modal-content">
 							<div class="form-group">
 								<b>Date Requested: </b><h6>{{moment date_requested 'MMM DD, YYYY'}}</h6>

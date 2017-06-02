@@ -11,7 +11,12 @@ var Handlebars = require('handlebars');
 var moment = require('moment');
 var datepicker = require('js-datepicker');
 
-var index = require('./routes/admin');
+var index = require('./routes/index');
+var profile = require('./routes/profile');
+var dashboard = require('./routes/dashboard');
+var admin = require('./routes/admin');
+var create = require('./routes/create');
+var report = require('./routes/report');
 
 var app = express();
 
@@ -158,5 +163,35 @@ Handlebars.registerHelper('count', function (id, logs, status, options){
     return c;
   });
 });
-
+Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+    switch (operator) {
+        case '==':
+            return (v1 == v2) ? options.fn(this) : options.inverse(this);
+        case '===':
+            return (v1 === v2) ? options.fn(this) : options.inverse(this);
+        case '!=':
+            return (v1 != v2) ? options.fn(this) : options.inverse(this);
+        case '!==':
+            return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+        case '<':
+            return (v1 < v2) ? options.fn(this) : options.inverse(this);
+        case '<=':
+            return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+        case '>':
+            return (v1 > v2) ? options.fn(this) : options.inverse(this);
+        case '>=':
+            return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+        case '&&':
+            return (v1 && v2) ? options.fn(this) : options.inverse(this);
+        case '||':
+            return (v1 || v2) ? options.fn(this) : options.inverse(this);
+        default:
+            return options.inverse(this);
+    }
+});
 app.use('/', index);
+app.use('/profile', profile);
+app.use('/dashboard', dashboard);
+app.use('/admin', admin);
+app.use('/create', create);
+app.use('/report', report);

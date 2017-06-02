@@ -1,6 +1,6 @@
 
 <div class="row">
-	<form method="post" action="/{{team.team}}/{{user_id}}/report">
+	<form method="post" action="/report">
 		<div class="form-group col s4">
 			<label>From:</label>
 			<input type="date" max="{{moment asd 'YYYY-MM-DD'}}" class="form-control" name="from_date">
@@ -39,7 +39,7 @@
 		</tr>
 		{{/each}}
 	</table><br>
-	<form method="post" action="/{{team.team}}/{{user_id}}/report/download">
+	<form method="post" action="/report/download">
 		<input type="hidden" class="form-control" name="from" value="{{from}}">
 		<input type="hidden" class="form-control" name="to" value="{{to}}">
 		<button type="submit" class="waves-effect waves-light btn col s4 right blue">Download Report</button>

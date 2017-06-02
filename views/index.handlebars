@@ -7,7 +7,7 @@
 				<img src="{{user.img}}">
 			</div>
 			<div id="image" class="modal ">
-				<form method="post" action="/{{team.team}}/{{user_id}}/image">
+				<form method="post" action="/profile/image">
 					<div class="modal-content">
 						<div style="height: 200px; width: 200px; overflow:hidden">
 							<img src="{{user.img}}" width="100%">
@@ -77,7 +77,7 @@
 				<img src="{{user.img}}">
 			</div>
 			<div id="img" class="modal ">
-				<form method="post" action="/{{team.team}}/{{user_id}}/image">
+				<form method="post" action="/profile/image">
 					<div class="modal-content">
 						<div style="height: 200px; width: 200px; overflow:hidden">
 							<img src="{{user.img}}" width="100%">
@@ -141,25 +141,25 @@
 			</div>
 		</div>
 	</div>
-	<div class="col xl4 m6 offset-m3 s12"><br><br>
+	<div class="col xl4 m6 offset-m3 s12 center-align"><br><br>
 		<div id="in_out">
 		{{#if log.timein}}
-			{{#if log.breakin}}
-				{{#if log.breakout}}
-					{{#if log.timeout}}{{else}}
-						<form method="post" action="/{{team.team}}/{{user_id}}/timeout/{{dates}}/{{time}}">
-						<button type="submit" id="tout" class="waves-effect waves-light btn-large col s12 red darken-1">Time Out</button>
-					{{/if}}
-				{{else}}
-					<form method="post" action="/{{team.team}}/{{user_id}}/breakout/{{dates}}/{{time}}">
-					<button type="submit" id="tout" class="waves-effect waves-light btn-large col s12 red lighten-1">End Break</button>
-				{{/if}}
+			{{#if log.timeout}}
 			{{else}}
-				<form id="breakin" method="post" action="/{{team.team}}/{{user_id}}/breakin/{{dates}}/{{time}}">
-				<button type="submit" id="bin" class="waves-effect waves-light btn-large col s12 blue lighten-1">Start Break</button>
+				{{#ifCond log.breakin.length '==' log.breakout.length}}
+					<form id="breakin" method="post" action="/profile/breakin/{{dates}}/{{time}}">
+					<button type="submit" id="bin" class="waves-effect waves-light btn-large col s12 blue lighten-1">Start Break</button>
+					</form>
+					<form method="post" action="/profile/timeout/{{dates}}/{{time}}">
+					<button type="submit" id="tout" class="waves-effect waves-light btn-large col s12 red darken-1">Time Out</button>
+				{{else}}
+					<form method="post" action="/profile/breakout/{{dates}}/{{time}}">
+					<button type="submit" id="tout" class="waves-effect waves-light btn-large col s12 red lighten-1">End Break</button>
+					</form>
+				{{/ifCond}}
 			{{/if}}
 		{{else}}
-			<form id="timein" method="post" action="/{{team.team}}/{{user_id}}/timein/{{dates}}/{{time}}">
+			<form id="timein" method="post" action="/profile/timein/{{dates}}/{{time}}">
 			<button type="submit" id="tin" class="waves-effect waves-light btn-large col s12 blue darken-1">Time In</button>
 		{{/if}}
 				<div class="form-group">
@@ -173,7 +173,7 @@
 		</div>
 		<div id="sick_leave">
 		{{#unless log.timein}}
-			<form method="post" action="/{{team.team}}/{{user_id}}/status/{{dates}}/">
+			<form method="post" action="/profile/status/{{dates}}/">
 				<button type="submit" id="sick" class="waves-effect waves-light btn col s12">Sick Leave</button>
 			</form>
 		{{/unless}}
@@ -182,7 +182,7 @@
 </div>
 
 <div id="History" class="col s12">
-	<form method="post" action="/{{team.team}}/{{user_id}}/filter" class="row">
+	<form method="post" action="/profile/filter" class="row">
 		<div class="form-group col l3 m5 s6">
 			<select multiple name="filterMonth">
 				<option disabled selected>Select Month</option>
@@ -228,7 +228,7 @@
 					{{#equal this (moment ../date 'MM')}}
 						{{#each ../../filterStatus}}
 							{{#equal this ../../status.0.status}}
-							<form method="post" action="/{{../../../team.team}}/{{../../../user_id}}/time">
+							<form method="post" action="/profile/time">
 								<tr>
 									<td>
 										{{moment ../../date 'MMM DD YYYY'}}
@@ -273,36 +273,10 @@
 										{{../../status.0.status}}
 									</td>
 									<td>
-										{{#each ../../timeout}}
-											{{#each ../../../breakout}}
-												{{#equal @../index @index}}
-													{{#each ../../../../breakin}}
-														{{#equal @../index @index}}
-															{{#each ../../../../../timein}}
-																{{#equal @../index @index}}
-																	{{var 'tout' ../../../timeout}}
-																	{{var 'bout' ../../breakout}}
-																	{{var 'bin' ../breakin}}
-																	{{var 'tin' timein}}
-																	{{var 'sta' ../../../../../../status.0.status}}
-																	{{#equal sta 'Present'}}
-																		{{#equal tin 'N/A'}}
-																		{{else}}
-																			{{hours_spent tin bin bout tout}}<br>
-																		{{/equal}}
-																	{{/equal}}
-																	{{#equal sta 'Late'}}
-																		{{#equal tin 'N/A'}}
-																		{{else}}
-																			{{hours_spent tin bin bout tout}}<br>
-																		{{/equal}}
-																	{{/equal}}
-																{{/equal}}
-															{{/each}}
-														{{/equal}}
-													{{/each}}
-												{{/equal}}
-											{{/each}}
+										{{#each ../../../hours_spent}}
+											{{#ifCond date '==' ../../../date}}
+												{{hours}}
+											{{/ifCond}}
 										{{/each}}
 									</td>
 								</tr>
@@ -319,7 +293,7 @@
 	<div class="leave">
 		<button id="leave" data-target="vacation" class="waves-effect waves-light btn col s12">Vacation Leave</button>
 		<div id="vacation" class="modal modal-fixed-footer">
-			<form method="post" action="/{{team.team}}/{{user_id}}/leave/form">
+			<form method="post" action="/profile/leave/form">
 					<div class="modal-content">
 						<h3>Leave Form</h3>
 						<input class="form-control" type="hidden" name="name" value="{{wuser.first_name}} {{wuser.last_name}}">
@@ -356,7 +330,7 @@
 			<td>
 				<button class="btn red waves-effect waves-light delete-form" data-target="form{{_id}}">Cancel</button>
 				<div id="form{{_id}}" class="modal s2">
-				<form method="post" action="/{{../team.team}}/{{../user_id}}/leave/form/delete/{{_id}}">
+				<form method="post" action="/profile/leave/form/delete/{{_id}}">
 					<div class="modal-content center-align">
 						<h6>Do you want to cancel this form?</h6>
 					</div>
@@ -376,7 +350,7 @@
 <div class="row">
 <h3> Update a User </h3>
 	<div class="col s10 offset-s1">
-		<form method="post" action="/{{team.team}}/{{user_id}}">
+		<form method="post" action="/{{team.team}}">
 			<div class="col l6 m8 offset-m2 s12">
 				<div class="form-group">
 					<label> First Name: </label>

@@ -21,14 +21,14 @@
 		          <ul id="nav-mobile" class="right hide-on-med-and-down">
 		          	{{#if wuser}}
 		          		{{#equal page 'profile'}}
-	            			<li class="active"><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
+	            			<li class="active"><a href="/profile">Profile</a></li>
 	            		{{else}}
-	            			<li><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
+	            			<li><a href="/profile">Profile</a></li>
 	            		{{/equal}}
 	            		{{#equal page 'dashboard'}}
-					    	<li class="active"><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
+					    	<li class="active"><a href="/dashboard">Dashboard</a></li>
 						{{else}}
-					    	<li><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
+					    	<li><a href="/dashboard">Dashboard</a></li>
 					    {{/equal}}
 				    	<li><a href="/logout">Logout</a></li>
 		          	{{else}}
@@ -77,15 +77,23 @@
 				{{else}}
 					<li class="tab"><a href="#History">History</a></li>
 				{{/equal}}
-				{{#equal wuser.position 'User'}}
-					<li class="tab disabled"><a href="#Form">Form</a></li>
-				{{else}}
+				{{#ifCond wuser.department '==' 'Head'}}
 			      	{{#equal tab 'form'}}
 						<li class="tab"><a class="active" href="#Form">Form</a></li>
 					{{else}}
 						<li class="tab"><a href="#Form">Form</a></li>
 					{{/equal}}
-				{{/equal}}
+				{{else}}
+					{{#ifCond wuser.position '==' 'Manager'}}
+				      	{{#equal tab 'form'}}
+							<li class="tab"><a class="active" href="#Form">Form</a></li>
+						{{else}}
+							<li class="tab"><a href="#Form">Form</a></li>
+						{{/equal}}
+					{{else}}
+						<li class="tab disabled"><a href="#Form">Form</a></li>
+					{{/ifCond}}
+				{{/ifCond}}
 					<div class="right hide-on-small-and-down">
 						<li class="tab disabled"><a href="#">Schedule: </a></li>
 						<li class="tab disabled"><a href="#">{{moment (add dates team.sched_in) 'hh:mm A'}} - {{moment (add dates team.sched_out) 'hh:mm A'}}</a></li>
@@ -98,6 +106,11 @@
 						<li class="tab"><a class="active" href="#User">Manage User</a></li>
 					{{else}}
 						<li class="tab"><a href="#User">Manage User</a></li>
+					{{/equal}}
+			      	{{#equal tab 'Department'}}
+						<li class="tab"><a class="active" href="#Department">Departments/Positions</a></li>
+					{{else}}
+						<li class="tab"><a href="#Department">Departments/Positions</a></li>
 					{{/equal}}
 			      	{{#equal tab 'Account'}}
 						<li class="tab"><a class="active" href="#Account">Account Settings</a></li>
@@ -119,7 +132,7 @@
 				        <div class="background">
 				        	<img src="https://ak5.picdn.net/shutterstock/videos/699709/thumb/1.jpg" width="100%">
 				        </div>
-				        <a href="/{{wuser.team}}/{{wuser._id}}">
+				        <a href="/profile">
 							<div style="height: 75px; width: 75px; overflow:hidden; border-radius: 50%">
 								<img src="{{wuser.img}}" width="100%">
 							</div></a>
@@ -127,14 +140,20 @@
 				        <a href="#!email"><span class="white-text email">{{wuser.email}}</span></a>
 				    </div>
 			    </li>
-            	<li><a href="/{{team.team}}/{{user_id}}">Profile</a></li>
-            	<li><a href="/{{team.team}}/{{user_id}}/dashboard">Dashboard</a></li>
-            	{{#equal wuser.position 'User'}}
-            	{{else}}
-            		<li><a href="/{{team.team}}/{{user_id}}/report">Report</a></li>
-            		<li><a href="/{{team.team}}/{{user_id}}/create">Create Users</a></li>
-            		<li><a href="/{{team.team}}/{{user_id}}/admin">Admin</a></li>
-            	{{/equal}}
+            	<li><a href="/profile">Profile</a></li>
+            	<li><a href="/dashboard">Dashboard</a></li>
+				{{#ifCond wuser.department '==' 'Head'}}
+            		<li><a href="/report">Report</a></li>
+            		<li><a href="/create">Create Users</a></li>
+            		<li><a href="/admin">Admin</a></li>
+				{{else}}
+					{{#ifCond wuser.position '==' 'Manager'}}
+	            		<li><a href="/report">Report</a></li>
+	            		<li><a href="/create">Create Users</a></li>
+	            		<li><a href="/admin">Admin</a></li>
+					{{else}}
+            		{{/ifCond}}
+            	{{/ifCond}}
             	<li><a href="/logout">Logout</a></li>
           	{{else}}
             	<li><a href="/login">Login</a></li>

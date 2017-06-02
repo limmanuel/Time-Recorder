@@ -1,82 +1,181 @@
 
-<div id="User" class="col s12">
+<div id="User" class="col s12 row">
 <div class="row">
 <h3> Manage Users</h3>
-	<div class="col s10 offset-s1">
+	<div class="col s12">
 	<table class="striped col m12">
 		<tr>
 			<th></th>
 			<th>Name</th>
+			<th>Department</th>
 			<th>Position</th>
-			<th></th>
 			<th></th>
 		</tr>
 {{#each user}}
 		<tr>
-			<form method="post" action="/{{../team.team}}/{{../user_id}}/admin/settings/update/{{_id}}">
-				<td>
-					<div style="height: 50px; width: 50px; overflow:hidden; border-radius: 50%">
-						<img src="{{img}}" width="100%">
-					</div>
-				</td>
-				<td>
-					{{first_name}} {{last_name}}
-				</td>
-				<td>
-					<input type="hidden" name="team" value="{{team}}">
-					<input class="form-control" type="hidden" name="fname" placeholder="First Name" value="{{first_name}}">
-					<input class="form-control" type="hidden" name="lname" placeholder=" Last Name" value="{{last_name}}">
-					<input class="form-control" type="hidden" name="email" placeholder="Email" value="{{email}}">
-					<input class="form-control" type="hidden" name="username" placeholder="Username" value="{{username}}">
-					<input class="form-control" type="hidden" name="password" placeholder="Password">
-					<input class="form-control" type="hidden" name="password2" placeholder="Password">
-					{{#equal position 'Owner'}}
-						{{position}}
-					{{else}}
-					<div class="form-group">
-						<select class="form-control browser-default" type="text" name="position">
-							{{#equal position 'User'}}
-								<option value="Manager">Manager</option>
-								<option value="User" selected>User</option>
-							{{else}}
-								<option value="Manager" selected>Manager</option>
-								<option value="User">User</option>
-							{{/equal}}
+			<td>
+				<div style="height: 50px; width: 50px; overflow:hidden; border-radius: 50%">
+					<img src="{{img}}" width="100%">
+				</div>
+			</td>
+			<td>
+				{{first_name}} {{last_name}}
+			</td>
+			<td>
+				<div id="dept{{id}}" class="modal">
+				<form method="post" action="/admin/user/update/{{id}}">
+				<input type="hidden" name="team" value="{{team}}">
+				<input class="form-control" type="hidden" name="fname" placeholder="First Name" value="{{first_name}}">
+				<input class="form-control" type="hidden" name="lname" placeholder=" Last Name" value="{{last_name}}">
+				<input class="form-control" type="hidden" name="email" placeholder="Email" value="{{email}}">
+				<input class="form-control" type="hidden" name="username" placeholder="Username" value="{{username}}">
+				<input class="form-control" type="hidden" name="password" placeholder="Password">
+				<input class="form-control" type="hidden" name="password2" placeholder="Password">
+				<input type="hidden" name="position" value="No Position">
+					<div class="modal-content">
+						<h6>Select new department</h6>
+						<select class="form-control browser-default" type="text" name="department">
+							{{#each ../team.departments}}
+								{{#equal ../department department}}
+									<option value="{{department}}" selected>{{department}}</option>
+								{{else}}
+									<option value="{{department}}">{{department}}</option>
+								{{/equal}}
+							{{/each}}
 						</select>
 					</div>
-					{{/equal}}
-				</td>
-				<td>
-					{{#equal position 'Owner'}}
+					<div class="modal-footer">
+						<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Update</button>
+						<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					</div>
+				</form>
+				</div>
+				{{#ifCond position '!==' 'CEO'}}
+					{{#ifCond ../wuser.department '==' 'Head'}}
+						<button type="submit" data-target="dept{{id}}" class="waves-effect waves-light btn-flat col s12">{{department}}</button>
 					{{else}}
-					<div class="col s12 center">
-						<button type="submit" class="waves-effect waves-light btn-flat col s12">Update</button>
-					</div>
-					{{/equal}}
-				</td>
-			</form>
-			<td>
-				{{#equal position 'Owner'}}
+						<p class="btn-flat col s12 center-align">{{department}}</p>
+					{{/ifCond}}
 				{{else}}
-					<button class="btn red waves-effect waves-light delete-form" data-target="settings{{_id}}">Delete</button>
-					<div id="settings{{_id}}" class="modal">
-					<form method="post" action="/{{../team.team}}/{{../user_id}}/admin/settings/delete/{{_id}}">
-						<div class="modal-content center-align">
-							<h6>Do you want to delete this user?</h6>
+					<p class="btn-flat col s12 center-align">{{department}}</p>
+				{{/ifCond}}
+			</td>
+			<td>
+				{{#ifCond position '!==' 'CEO'}}
+					<button type="submit" data-target="pos{{id}}" class="waves-effect waves-light btn-flat col s12">{{position}}</button>
+				{{else}}
+					<p class="btn-flat col s12 center-align">{{position}}</p>
+				{{/ifCond}}
+				<div id="pos{{id}}" class="modal">
+				<form method="post" action="/admin/user/update/{{id}}">
+				<input type="hidden" name="team" value="{{team}}">
+				<input class="form-control" type="hidden" name="fname" placeholder="First Name" value="{{first_name}}">
+				<input class="form-control" type="hidden" name="lname" placeholder=" Last Name" value="{{last_name}}">
+				<input class="form-control" type="hidden" name="email" placeholder="Email" value="{{email}}">
+				<input class="form-control" type="hidden" name="username" placeholder="Username" value="{{username}}">
+				<input class="form-control" type="hidden" name="password" placeholder="Password">
+				<input class="form-control" type="hidden" name="password2" placeholder="Password">
+				<input type="hidden" name="department" value="{{department}}">
+					<div class="modal-content">
+						<h6>Select new position</h6>
+						<div class="form-group">
+							<label>Position:</label>
+							<select class="form-control browser-default" type="text" name="position">
+								<option value="No Position">No Position</option>
+								{{#each ../team.departments}}
+									{{#equal department ../department}}
+										{{#each positions}}
+											{{#equal position 'CEO'}}
+											{{else}}
+												<option value="{{position}}">{{position}}</option>
+											{{/equal}}
+										{{/each}}
+									{{/equal}}
+								{{/each}}
+							</select>
+							<input type="hidden" name="dept_name" value="{{department}}">
 						</div>
-						<div class="modal-footer">
-								<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
-								<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
-						</div>
-					</form>
 					</div>
-				{{/equal}}
+					<div class="modal-footer">
+						<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Update</button>
+						<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					</div>
+				</form>
+				</div>
+			</td>
+			<td>
+				{{#ifCond position '!==' 'CEO'}}
+					<button class="btn red waves-effect waves-light delete-form" data-target="settings{{_id}}">Delete</button>
+				{{/ifCond}}
+				<div id="settings{{_id}}" class="modal">
+				<form method="post" action="/admin/user/delete/{{_id}}">
+					<div class="modal-content center-align">
+						<h6>Do you want to delete this user?</h6>
+					</div>
+					<div class="modal-footer">
+							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Confirm</button>
+							<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					</div>
+				</form>
+				</div>
 			</td>
 		</tr>
 {{/each}}
 	</table>
 	</div>
 </div>
+</div>
+<div id="Department" class="col s12">
+	<h3>Departments and Positions</h3>
+	<div class="col s12">
+	<table class="bordered">
+		<tr>
+			<th>Department</th>
+			<th>Positions</th>
+			<th></th>
+		</tr>
+	{{#each team.departments}}
+		<tr>
+			<td>{{department}}</td>
+			<td>
+				{{#each positions}}
+					<li>{{position}}</li>
+				{{/each}}
+			</td>
+			<td>
+				<button class="waves-effect waves-light btn-flat" data-target="{{id}}">Add Position</button>
+				<div id="{{id}}" class="modal">
+					<form method="post" action="/admin/department/add/position">
+						<div class="modal-content">
+							<h6>Add Position for {{department}}</h6>
+							<div class="form-group">
+							<label>Position:</label>
+								<input type="text" name="pos_name" placeholder="Input position name">
+								<input type="hidden" name="dept_name" value="{{department}}">
+							</div>
+						</div>
+						<div class="modal-footer">
+								<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Add</button>
+								<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+						</div>
+					</form>
+				</div>
+			</td>
+		<tr>
+	{{/each}}
+		<tr>
+			<form method="post" action="/admin/department/create">
+				<td>
+					<input type="text" name="dept_name" placeholder="Add Department">
+				</td>
+				<td>
+					<button class="waves-effect waves-light btn-flat" type="submit">Add Department</button>
+				</td>
+				<td></td>
+			</form>
+		</tr>
+	</table>
+	</div>
 </div>
 
 <div id="Account" class="col s12">
@@ -96,10 +195,10 @@
 			<input class="form-control" type="time" name="sched_out" value="{{team.sched_out}}" readonly>
 		</div>
 		<div class="col m2 s12">
-			{{#equal wuser.position 'Owner'}}
+			{{#equal wuser.department 'Head'}}
 				<button type="submit" class="waves-effect waves-light btn-flat col s12" data-target="Account_Settings">Edit</button>
 				<div id="Account_Settings" class="modal">
-					<form method="post" action="/{{team.team}}/{{user_id}}/admin/settings/update">
+					<form method="post" action="/admin/settings/update">
 						<div class="modal-content">
 							<div class="form-group col s6"><br>
 								<label> Team: </label>
@@ -140,7 +239,7 @@
 				<td>
 					<button class="btn red waves-effect waves-light delete-form" data-target="holiday{{_id}}">Delete</button>
 					<div id="holiday{{_id}}" class="modal">
-					<form method="post" action="/{{../team.team}}/{{../user_id}}/admin/settings/delete/holiday/{{_id}}">
+					<form method="post" action="/admin/settings/delete/holiday/{{_id}}">
 						<div class="modal-content center-align">
 							<h6>Do you want to cancel this form?</h6>
 						</div>
@@ -156,7 +255,7 @@
 	</table>
 	<button class="waves-effect waves-light btn-flat col s12" data-target="Add_Holiday">Add Holiday</button>
 	<div id="Add_Holiday" class="modal">
-		<form method="post" action="/{{team.team}}/{{user_id}}/admin/settings/holiday/add">
+		<form method="post" action="/admin/settings/holiday/add">
 			<div class="modal-content">
 				<div class="form-group col m6 s12">
 					<label> Holiday: </label>

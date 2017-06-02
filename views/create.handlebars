@@ -2,7 +2,7 @@
 <div class="row">
 <h3> Create a User </h3>
 	<div class="col s10 offset-s1">
-		<form method="post" action="/{{team.team}}/{{user_id}}/create">
+		<form method="post" action="/create">
 			<div class="col l6 m8 offset-m2 s12">
 				<div class="form-group">
 					<label> First Name: </label>
@@ -17,11 +17,16 @@
 					<input class="form-control" type="email" name="email" placeholder="Email">
 				</div>
 				<div class="form-group">
-					<label> Position: </label>
-					<select class="form-control" type="text" name="position">
-						<option value="Manager">Manager</option>
-						<option value="User" selected>User</option>
-					</select>
+					<label> Department: </label>
+					{{#ifCond user.position '==' 'Manager'}}
+						<input class="form-control" type="text" name="department" value="{{wuser.department}}" readonly>
+					{{else}}
+						<select class="form-control" type="text" name="department">
+							{{#each team.departments}}
+								<option value="{{department}}">{{department}}</option>
+							{{/each}}
+						</select>
+					{{/ifCond}}
 				</div>
 			</div>
 			<div class="col l6 m8 offset-m2 s12">
