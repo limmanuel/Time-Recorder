@@ -335,19 +335,6 @@ router.post('/settings/holiday/add', ensureAuthenticated,  function(req,res,next
 router.post('/settings/delete/holiday/:holiday_id', function(req,res,next){
 	let query = {team: req.user.team};
 	Account.delHoliday(query, req.params.holiday_id, function(err, response){});
-	Time.getTimeLogsByTeam(req.user.team, function(err, logs){
-		logs.forEach(function(log){
-			var hdate = req.body.hdate;
-			var ldate = log.date;
-			if(ldate == hdate){
-					console.log(log._id);
-				let lquery = {_id: log._id}
-				Time.deleteLog(query, function(err, del){
-					console.log(del)
-				});
-			}
-		});
-	});
 	res.redirect('/admin/?tab=Account');
 });
 
