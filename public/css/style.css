@@ -1,7 +1,6 @@
 p{
 	color: white;
-	border-radius: 3px;
-	margin-top: 5px;
+  margin: 0px;
 	font-size: 18px;
 }p.dashboard {
 	color: white !important; 

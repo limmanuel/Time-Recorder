@@ -9,6 +9,7 @@
 			<th>Name</th>
 			<th>Department</th>
 			<th>Position</th>
+			<th>No. of Leave<br> Allowed</th>
 			<th></th>
 		</tr>
 {{#each user}}
@@ -104,8 +105,23 @@
 				</div>
 			</td>
 			<td>
+				<button class="btn-flat waves-effect waves-light delete-form" data-target="count{{_id}}">{{leave_count}}</button>
+				<div id="count{{_id}}" class="modal">
+				<form method="post" action="/admin/user/add_leave/{{_id}}">
+					<div class="modal-content center-align">
+						<h6>Add Allowed Leave to {{first_name}} {{last_name}}</h6>
+						<input type="number" min="0" class="col s3 offset-s4" name="count" placeholder="Add Leave">
+					</div>
+					<div class="modal-footer">
+							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Add</button>
+							<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+					</div>
+				</form>
+				</div>
+			</td>
+			<td>
 				{{#ifCond position '!==' 'CEO'}}
-					<button class="btn red waves-effect waves-light delete-form" data-target="settings{{_id}}">Delete</button>
+					<button class="btn red waves-effect waves-light delete-form" data-target="settings{{_id}}"><i class="material-icons waves-effect waves-light">delete</i></button>
 				{{/ifCond}}
 				<div id="settings{{_id}}" class="modal">
 				<form method="post" action="/admin/user/delete/{{_id}}">
@@ -139,12 +155,24 @@
 			<td>{{department}}</td>
 			<td>
 				{{#each positions}}
-					<li>{{position}}</li>
+					<form method="post" action="/admin/delete/position/{{id}}">
+						<h6>{{position}}
+						{{#ifCond position '==' 'CEO'}}{{else}}
+							{{#ifCond position '!==' 'Manager'}}
+								<button type="submit" class="btn-flat"><i class="material-icons waves-effect waves-light">delete</i></button>
+							{{/ifCond}}
+						{{/ifCond}}</h6>
+						<div class="form-group">
+							<input type="hidden" name="department" value="{{../department}}">
+							<input type="hidden" name="last_pos" value="{{position}}">
+							<input type="hidden" name="position" value="No Position">
+						</div>
+					</form>
 				{{/each}}
 			</td>
 			<td>
-				<button class="waves-effect waves-light btn-flat" data-target="{{id}}">Add Position</button>
-				<div id="{{id}}" class="modal">
+				<button class="waves-effect waves-light btn-flat" data-target="add{{id}}">Add Position</button>
+				<div id="add{{id}}" class="modal">
 					<form method="post" action="/admin/department/add/position">
 						<div class="modal-content">
 							<h6>Add Position for {{department}}</h6>
@@ -156,6 +184,29 @@
 						</div>
 						<div class="modal-footer">
 								<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Add</button>
+								<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+						</div>
+					</form>
+				</div>
+				{{#ifCond department '!==' 'Head'}}
+					<button class="waves-effect waves-light btn-flat" data-target="del{{id}}">Delete</button>
+				{{/ifCond}}
+				<div id="del{{id}}" class="modal">
+					<form method="post" action="/admin/department/delete/{{id}}">
+						<div class="modal-content">
+							<h6>Delete {{department}} and switch to:</h6>
+							<div class="form-group">
+								<input type="hidden" name="last_dept" value="{{department}}">
+								<input type="hidden" name="position" value="No Position">
+								<select class="form-control browser-default" type="text" name="department">
+									{{#each ../team.departments}}
+										<option value="{{department}}">{{department}}</option>
+									{{/each}}
+								</select>
+							</div>
+						</div>
+						<div class="modal-footer">
+								<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Switch</button>
 								<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
 						</div>
 					</form>
@@ -241,7 +292,8 @@
 					<div id="holiday{{_id}}" class="modal">
 					<form method="post" action="/admin/settings/delete/holiday/{{_id}}">
 						<div class="modal-content center-align">
-							<h6>Do you want to cancel this form?</h6>
+							<h6>Do you want to delete this Holiday?</h6>
+							<input type="hidden" name="hdate" value="{{moment (add date (moment ../dates 'YYYY')) 'MM-DD-YYYY'}}">
 						</div>
 						<div class="modal-footer">
 								<button type="submit" class="waves-effect waves-light btn col s6 modal-action modal-close">Confirm</button>

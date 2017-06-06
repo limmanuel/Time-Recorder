@@ -89,7 +89,8 @@ router.post('/register', function(req,res,next){
 					email: email,
 					password: password,
 					department: department,
-					position: position
+					position: position,
+					leave_count: 0
 				});
 				Wuser.registerUser(newWuser, function(err, user){
 					var newLog = new Time ({
@@ -136,14 +137,21 @@ router.get('/login', function(req,res,next){
 							var userid = user._id;
 							var name = user.first_name+' '+user.last_name;
 							Time.getTimeLogsByUser(userid, function(err, logs){
+								var t = 0;
 								var l = 0;
 								var h = 0;
 								var h_date = [];
 								var date_now = moment().format('MM-DD-YYYY');
+								var date_yes = moment().subtract(1,'d').format('MM-DD-YYYY');
 								var year = moment().format('-YYYY');
 								logs.forEach(function(log){
 									if(log.date == date_now){
 										l=1;
+									}
+									if(log.date == date_yes){
+										if(log.timeout.length > 0){
+											t=1;
+										}
 									}
 									account.holiday.forEach(function(holidays){
 										if(log.date == (holidays.date+year)){
@@ -153,6 +161,13 @@ router.get('/login', function(req,res,next){
 										}
 									});
 								});
+								if(t == 0){
+									let query = {user_id: userid, date: date_yes}
+									var time = {
+										timeout: account.sched_out+':00'
+									}
+									Time.addTimeOut(query, time, function(err, data){});
+								}
 								if(h == 0){
 									h_date.forEach(function(date){
 										var holiday_date = date;

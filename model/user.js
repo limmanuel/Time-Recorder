@@ -29,6 +29,9 @@ var wuserSchema = mongoose.Schema({
 	},
 	position: {
 		type: String
+	},
+	leave_count: {
+		type: Number
 	}
 });
 
@@ -56,7 +59,7 @@ module.exports.comparePassword = function(pass, hash, callback){
 }
 
 module.exports.updateUser = function(pass, query, updateUser, callback){
-	if(updateUser.password){
+	if(updateUser.password !== pass){
 		bcrypt.genSalt(10, function(err,salt){
 				bcrypt.hash(updateUser.password,salt, function(err, hash){
 					if(err){
@@ -94,6 +97,15 @@ module.exports.deleteUser = function(query, callback){
 module.exports.updateTeam = function(query, team, callback){
 	Wuser.update(query, {$set: team}, callback);
 }
+
+module.exports.updateDepartment = function(query, department, callback){
+	Wuser.updateOne(query, department, callback);
+}
+
+module.exports.updateLeaveCount = function(query, leave_count, callback){
+	Wuser.update(query, leave_count, callback);
+}
+
 module.exports.setPicture = function(query, img, callback){
 	Wuser.update(query, {$set: img}, callback);
 }

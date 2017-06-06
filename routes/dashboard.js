@@ -51,22 +51,27 @@ router.get('/', ensureAuthenticated, function (req,res,next){
 								var name = val.name;
 								var bdate=val.date;
 								var d;
-								val.timein.forEach(function(tin, index){
-									if(tin.timein !== 'N/A' && val.timeout[index] && tin){						
-										var timems = moment(val.timeout[index].timeout,"HH:mm:ss").diff(moment(tin.timein,"HH:mm:ss"));
-										tms=tms+timems;
-										val.breakin.forEach(function(bin, index){
-											if(bin.breakin !== 'N/A' && val.breakout[index] && bin){						
-												var breakms = moment(val.breakout[index].breakout,"HH:mm:ss").diff(moment(bin.breakin,"HH:mm:ss"));
-												bms=bms+breakms;
-											}
-										});
-									}
-								});
-								ms = tms - bms;
+							val.timeout.forEach(function(tout, index){
+								if(val.breakout){
+									val.breakout.forEach(function(bout, ind){
+										if(bout.breakout !== 'N/A'){						
+											var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(val.breakin[ind].breakout,"HH:mm:ss"));
+											bms=bms+breakms;
+										}
+									});
+								}
+								if(tout.timeout !== 'N/A' && val.timein[index] && tout){						
+									var timems = moment(tout.timeout,"HH:mm:ss").diff(moment(val.timein[index].timein,"HH:mm:ss"));
+									tms=tms+timems;
+								}
+							});
+							ms = tms - bms;
+							bd = moment.duration(bms).format("HH:mm:ss");
+							if(ms > 0){
 								d = moment.duration(ms).format("HH[h] mm[m] ss[s]");
-								arr = {hours: d, date:bdate, name: name}
-								hours_spent.push(arr); 
+							}
+							arr = {hours: d, date:bdate, name: name}
+							hours_spent.push(arr);
 							});
 							res.render('dashboard', {
 								page: 'dashboard',
@@ -113,37 +118,59 @@ router.post('/filter', ensureAuthenticated,  function(req,res,next){
 //Update Form
 router.post('/leave/form/:user_id/update/:leave_id', ensureAuthenticated, function(req,res,next){
 	let query = {_id: req.params.leave_id};
+	let user_query = {_id: req.params.user_id}
 	var leave_date = req.body.leave_date;
 	var leave_status = req.body.leave_status;
-	if(leave_status == 'deny'){
-		Request.updateLeave(query, leave_status, function(err,data){
-			if(err){return console.log(err);}
+	var count = req.body.count;
+	Request.getRequestById(req.params.leave_id, function(err, form){
+		var last_status = form.leave_status;
+		if(leave_status == last_status){} else {
+			if(leave_status == 'deny'){
+				Request.updateLeave(query, leave_status, function(err,data){
+					if(err){return console.log(err);}
+				});
+				count++;
+			} else {
+				if(count <= 0){
+					req.flash('error_msg', 'Reached the number of leave allowed!')
+				} else {
+					count--;
+					var newLog = new Time ({
+						date: leave_date,
+						team: req.user.team,
+						user_id: req.params.user_id,
+						timein: [{
+							timein: 'N/A'
+						}],
+						breakin: [{
+							breakin: 'N/A'
+						}],
+						breakout: [{
+							breakout: 'N/A'
+						}],
+						timeout: [{
+							timeout: 'N/A'
+						}],
+						status: [{
+							status: "Vacation"
+						}]
+					});
+					newLog.save(function(err){
+						if(err){
+							console.log(err);
+						}
+						Request.updateLeave(query, leave_status, function(err,val){});
+					});
+				}
+			}
+		}console.log(count);
+		var leave_count = {
+			leave_count: count
+		}
+		Wuser.updateLeaveCount(user_query, leave_count, function(err, user){
 			res.redirect('/dashboard/?tab=form');
 		});
-	} else {
-		var newLog = new Time ({
-			date: leave_date,
-			team: req.user.team,
-			user_id: req.params.user_id,
-			timein: [{
-				timein: 'N/A'
-			}],
-			timeout: [{
-				timeout: 'N/A'
-			}],
-			status: [{
-				status: "Vacation"
-			}]
-		});
-		newLog.save(function(err){
-			if(err){
-				console.log(err);
-			}
-			Request.updateLeave(query, leave_status, function(err,val){
-				res.redirect('/dashboard/?tab=form');
-			});
-		});
-	}
+	});
 });
 
 //Authentication

@@ -68,8 +68,9 @@ router.post('/', ensureAuthenticated, function(req,res,next){
 				err = 'Username Already Exist';
 			}
 		});
-		if(errors || err){
+		if(err){
 			if(req.user.position == 'User'){
+				req.flash('error_msg', err)
 				res.redirect('/create');
 			} else {
 				Account.getAccountByTeam(req.user.team, function(erro,team){
@@ -98,7 +99,8 @@ router.post('/', ensureAuthenticated, function(req,res,next){
 				email: email,
 				password: password,
 				department: department,
-				position: "No Position"
+				position: "No Position",
+				leave_count: 0
 			});
 			Wuser.registerUser(newWuser, function(err, user){
 				var newLog = new Time ({

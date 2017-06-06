@@ -109,36 +109,23 @@ Handlebars.registerHelper('greater', function(lvalue, rvalue, options) {
         return options.inverse(this);
     }
 });
-Handlebars.registerHelper('less', function(lvalue, rvalue, options) {
-    if (arguments.length < 3)
-        throw new Error("Handlebars Helper equal needs 2 parameters");
-    if( lvalue>rvalue ) {
-        return options.inverse(this);
-    } else {
-        return options.fn(this);
-    }
-});
 Handlebars.registerHelper('moment', function(date, format, options){
   return moment(date).format(format);
-})
+});
+Handlebars.registerHelper('momentAdd', function(date, add, format, options){
+  return moment(date).add(add).format(format);
+});
 Handlebars.registerHelper('lastArr', function(array, context){
   return array[array.length -1];
-})
+});
 Handlebars.registerHelper('addOne', function(num, options){
   return num+=1;
-})
+});
 Handlebars.registerHelper('subOne', function(num, options){
   return num-=1;
-})
+});
 Handlebars.registerHelper('add', function(left, right, options){
   return left + ' ' + right;
-})
-Handlebars.registerHelper('duration', function (timeout, timein, options){
-  var ms = moment(timeout,"HH:mm:ss").diff(moment(timein,"HH:mm:ss"));
-  var d = moment.duration(ms).format("HH[h] mm[m] ss[s]");
-  if(d!=='00s'){
-    return d
-  }
 });
 Handlebars.registerHelper('hours_spent', function (timein, breakin, breakout, timeout, options){
   var msin = moment(breakin,"HH:mm:ss").diff(moment(timein,"HH:mm:ss"));
@@ -148,20 +135,6 @@ Handlebars.registerHelper('hours_spent', function (timein, breakin, breakout, ti
   if(d!=='00s'){
     return d
   }
-});
-Handlebars.registerHelper('count', function (id, logs, status, options){
-  logs.forEach(function(log){
-    if(log.user_id == id){
-      var c = 0;
-      log.status.forEach(function(stat){
-        if(stat.status == status){
-          c++;
-        }
-      });
-    }
-    console.log(c);
-    return c;
-  });
 });
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
     switch (operator) {

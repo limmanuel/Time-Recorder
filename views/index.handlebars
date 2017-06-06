@@ -1,7 +1,7 @@
 
 <div class="row">
 <div id="Home" class="col s12 row">
-	<div class="col xl8 l12 hide-on-small-and-down">
+	<div class="col xl8 l12 m10 offset-m1 hide-on-small-and-down">
 		<div class="grey darken-3 card horizontal profile">
 			<div class="card-image waves-effect waves-light tooltipped" data-position="left" data-delay="50" data-tooltip="Change your profile picture" data-target="image" style="border-radius: 7px; width: 240px; height: 240px; overflow:hidden">
 				<img src="{{user.img}}">
@@ -22,12 +22,13 @@
 				</form>
 			</div>
 			<div class="card-stacked col" style="padding: 10px 0px 10px 5px">
-					<p class="col waves-effect waves-light s12 cyan float" >
-						<b>Name:</b> {{user.first_name}} {{user.last_name}}<br>
-						<b>Email:</b> {{user.email}} <br>
-						<b>Position:</b> {{user.position}}
-					</p>
-					<p class="col m12 waves-effect waves-light blue" style="margin-top: -15px;">
+					<div class="col waves-effect waves-light s12 cyan" >
+						<p><b>Name:</b> {{user.first_name}} {{user.last_name}}</p>
+						<p><b>Email:</b> {{user.email}}</p>
+						<p><b>Department:</b> {{user.department}}</p>
+						<p><b>Position:</b> {{user.position}}</p>
+					</div>
+					<p class="col s12 waves-effect waves-light blue">
 						<b>Time In: </b>
 						{{#each log.timein}}
 							{{#equal (addOne @index) ../log.timein.length}}
@@ -51,21 +52,25 @@
 					</p>
 		{{#each log.status}}
 			{{#equal (addOne @index) ../log.status.length}}
-				{{#equal status 'Present'}}
-					<p id="status" class="waves-effect waves-light btn-large col m12 blue" style="margin-top: -10px;">Present</p>
-				{{/equal}}
-				{{#equal status 'Late'}}
-					<p id="status" class="waves-effect waves-light btn-large col m12 orange" style="margin-top: -10px;">Late</p>
-				{{/equal}}
-				{{#equal status 'Sick'}}
-					<p id="status" class="waves-effect waves-light btn-large col m12 green" style="margin-top: -10px;">Sick</p>
-				{{/equal}}
-				{{#equal status 'Vacation'}}
-					<p id="status" class="waves-effect waves-light btn-large col m12 red" style="margin-top: -10px;">Vacation</p>
-				{{/equal}}
-				{{#equal status 'Absent'}}
-					<p id="status" class="waves-effect waves-light btn-large col m12 grey" style="margin-top: -10px;">Absent</p>
-				{{/equal}}
+				{{#ifCond ../log.breakin.length '>' ../log.breakout.length}}
+					<p id="status" class="waves-effect waves-light btn col s12 brown" style="margin-top: 5px;">On-Break</p>
+				{{else}}
+					{{#equal status 'Present'}}
+						<p id="status" class="waves-effect waves-light btn col s12 blue" style="margin-top: 5px;">Present</p>
+					{{/equal}}
+					{{#equal status 'Late'}}
+						<p id="status" class="waves-effect waves-light btn col s12 orange" style="margin-top: 5px;">Late</p>
+					{{/equal}}
+					{{#equal status 'Sick'}}
+						<p id="status" class="waves-effect waves-light btn col s12 green" style="margin-top: 5px;">Sick</p>
+					{{/equal}}
+					{{#equal status 'Vacation'}}
+						<p id="status" class="waves-effect waves-light btn col s12 red" style="margin-top: 5px;">Vacation</p>
+					{{/equal}}
+					{{#equal status 'Absent'}}
+						<p id="status" class="waves-effect waves-light btn col s12 grey" style="margin-top: 5px;">Absent</p>
+					{{/equal}}
+				{{/ifCond}}
 			{{/equal}}
 		{{/each}}
 			</div>
@@ -91,13 +96,14 @@
 					</div>
 				</form>
 			</div>
-			<div class="card-stacked col" style="margin-top: 0px">
-					<p class="col waves-effect waves-light s12 cyan float" >
-						<b>Name:</b> {{user.first_name}} {{user.last_name}}<br>
-						<b>Email:</b> {{user.email}} <br>
-						<b>Position:</b> {{user.position}}
-					</p>
-					<p class="col s12 waves-effect waves-light blue" style="margin-top: -15px;">
+			<div class="card-stacked col">
+					<div class="col waves-effect waves-light s12 cyan" >
+						<p><b>Name:</b> {{user.first_name}} {{user.last_name}}</p>
+						<p><b>Email:</b> {{user.email}}</p>
+						<p><b>Department:</b> {{user.department}}</p>
+						<p><b>Position:</b> {{user.position}}</p>
+					</div>
+					<p class="col s12 waves-effect waves-light blue">
 						<b>Time In: </b>
 						{{#each log.timein}}
 							{{#equal (addOne @index) ../log.timein.length}}
@@ -121,21 +127,25 @@
 					</p>
 		{{#each log.status}}
 			{{#equal (addOne @index) ../log.status.length}}
-				{{#equal status 'Present'}}
-					<p id="status" class="waves-effect waves-light btn-large col s12 blue" style="margin-top: -10px;">Present</p>
-				{{/equal}}
-				{{#equal status 'Late'}}
-					<p id="status" class="waves-effect waves-light btn-large col s12 orange" style="margin-top: -10px;">Late</p>
-				{{/equal}}
-				{{#equal status 'Sick'}}
-					<p id="status" class="waves-effect waves-light btn-large col s12 green" style="margin-top: -10px;">Sick</p>
-				{{/equal}}
-				{{#equal status 'Vacation'}}
-					<p id="status" class="waves-effect waves-light btn-large col s12 red" style="margin-top: -10px;">Vacation</p>
-				{{/equal}}
-				{{#equal status 'Absent'}}
-					<p id="status" class="waves-effect waves-light btn-large col s12 grey" style="margin-top: -10px;">Absent</p>
-				{{/equal}}
+				{{#ifCond ../log.breakin.length '>' ../log.breakout.length}}
+					<p id="status" class="waves-effect waves-light btn col s12 brown" style="margin-top: 5px;">On-Break</p>
+				{{else}}
+					{{#equal status 'Present'}}
+						<p id="status" class="waves-effect waves-light btn-large col s12 blue" style="margin-top: 5px;">Present</p>
+					{{/equal}}
+					{{#equal status 'Late'}}
+						<p id="status" class="waves-effect waves-light btn-large col s12 orange" style="margin-top: 5px;">Late</p>
+					{{/equal}}
+					{{#equal status 'Sick'}}
+						<p id="status" class="waves-effect waves-light btn-large col s12 green" style="margin-top: 5px;">Sick</p>
+					{{/equal}}
+					{{#equal status 'Vacation'}}
+						<p id="status" class="waves-effect waves-light btn-large col s12 red" style="margin-top: 5px;">Vacation</p>
+					{{/equal}}
+					{{#equal status 'Absent'}}
+						<p id="status" class="waves-effect waves-light btn-large col s12 grey" style="margin-top: 5px;">Absent</p>
+					{{/equal}}
+				{{/ifCond}}
 			{{/equal}}
 		{{/each}}
 			</div>
@@ -146,10 +156,12 @@
 		{{#if log.timein}}
 			{{#if log.timeout}}
 			{{else}}
-				{{#ifCond log.breakin.length '==' log.breakout.length}}
-					<form id="breakin" method="post" action="/profile/breakin/{{dates}}/{{time}}">
-					<button type="submit" id="bin" class="waves-effect waves-light btn-large col s12 blue lighten-1">Start Break</button>
-					</form>
+				{{#ifCond log.breakin.length '<=' log.breakout.length}}{{breaks}}
+					{{#ifCond breaks '==' ""}}
+						<form id="breakin" method="post" action="/profile/breakin/{{dates}}/{{time}}">
+						<button type="submit" id="bin" class="waves-effect waves-light btn-large col s12 blue lighten-1">Start Break</button>
+						</form> {{else}}
+					{{/ifCond}}
 					<form method="post" action="/profile/timeout/{{dates}}/{{time}}">
 					<button type="submit" id="tout" class="waves-effect waves-light btn-large col s12 red darken-1">Time Out</button>
 				{{else}}
@@ -315,7 +327,7 @@
 			</form>
 		</div>
 	</div>
-	<table class="col m12">
+	<table class="col s12">
 		<tr>
 			<th>Date Requested</th>
 			<th>Leave Request</th>

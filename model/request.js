@@ -29,6 +29,11 @@ module.exports.getRequestByUser = function(id,callback){
 	Request.find(query,callback);
 }
 
+module.exports.getRequestById = function(id,callback){
+	let query = {_id: id};
+	Request.findOne(query,callback);
+}
+
 module.exports.getRequestByUserAndDate = function(id,date,callback){
 	let query = {date: date, user_id: id};
 	Request.findOne(query,callback);

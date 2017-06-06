@@ -43,6 +43,7 @@ router.get('/',ensureAuthenticated, function (req,res,next){
 		var tab = 'home';
 	}
 	var hours_spent=[];
+	var breaks = "";
 	var arr = {};
 	Account.getAccountByTeam(req.user.team, function(err,team){
 		var team_log = team;
@@ -53,26 +54,35 @@ router.get('/',ensureAuthenticated, function (req,res,next){
 				Request.getRequestByUser(req.user.id, function(err, forms){
 					Time.getTimeLogsByUserAndDate(req.user.id, moment().format('MM-DD-YYYY'), function(err, log){
 						logs.forEach(function(val){
+							var ms = 0;
 							var bms = 0;
 							var tms = 0;
 							var bdate=val.date;
 							var d;
-							val.timein.forEach(function(tin, index){
-								if(tin.timein !== 'N/A' && val.timeout[index] && tin){						
-									var timems = moment(val.timeout[index].timeout,"HH:mm:ss").diff(moment(tin.timein,"HH:mm:ss"));
-									tms=tms+timems;
-									val.breakin.forEach(function(bin, index){
-										if(bin.breakin !== 'N/A' && val.breakout[index] && bin){						
-											var breakms = moment(val.breakout[index].breakout,"HH:mm:ss").diff(moment(bin.breakin,"HH:mm:ss"));
+							val.timeout.forEach(function(tout, index){
+								if(val.breakout){
+									val.breakout.forEach(function(bout, ind){
+										if(bout.breakout !== 'N/A'){						
+											var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(val.breakin[ind].breakout,"HH:mm:ss"));
 											bms=bms+breakms;
 										}
 									});
 								}
+								if(tout.timeout !== 'N/A' && val.timein[index] && tout){						
+									var timems = moment(tout.timeout,"HH:mm:ss").diff(moment(val.timein[index].timein,"HH:mm:ss"));
+									tms=tms+timems;
+								}
 							});
 							ms = tms - bms;
-							d = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+							bd = moment.duration(bms).format("HH:mm:ss");
+							if(ms > 0){
+								d = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+							}
 							arr = {hours: d, date:bdate}
-							hours_spent.push(arr); 
+							hours_spent.push(arr);
+							if(bdate == moment().format('MM-DD-YYYY') && bms >= 3600000){
+								breaks = 'No breaks'
+							}
 						});
 						if(err){
 							console.log(err);
@@ -94,6 +104,7 @@ router.get('/',ensureAuthenticated, function (req,res,next){
 							filterMonth: filterMonth,
 							forms: forms,
 							hours_spent: hours_spent,
+							breaks: breaks,
 							error: error
 						});
 					});
@@ -118,83 +129,99 @@ router.post('/image', ensureAuthenticated, function(req,res,next){
 //TimeIn
 router.post('/timein/:dates/:tin', ensureAuthenticated,  function(req,res,next){
 	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, user){
-		let query = {user_id: req.user.id, date: req.params.dates};
-		let status_query = {user_id: req.user.id, date: req.params.dates, 'status.status': 'Absent'};
-		var timein = moment().format('HH:mm:ss');
-		var sched = moment(req.params.dates + ' ' +req.body.sched_in).add(1,'m').format('HH:mm:ss');
-		var time = {
-			timein: timein
-		}
-		if(timein > sched){
-			var status = {
-				status: "Late"
+		if(user.timein.length == user.timeout.length){
+			let query = {user_id: req.user.id, date: req.params.dates};
+			let status_query = {user_id: req.user.id, date: req.params.dates, 'status.status': 'Absent'};
+			var timein = moment().format('HH:mm:ss');
+			var sched = moment(req.params.dates + ' ' +req.body.sched_in).add(1,'m').format('HH:mm:ss');
+			var time = {
+				timein: timein
 			}
-			if(user.status.length == user.timein.length){
-				Time.addStatus(query, status, function(err, data){});
+			if(timein > sched){
+				var status = {
+					status: "Late"
+				}
+				if(user.status.length == user.timein.length){
+					Time.addStatus(query, status, function(err, data){});
+				} else {
+					Time.updateStatus(status_query, status, function(err, data){});
+				}
 			} else {
-				Time.updateStatus(status_query, status, function(err, data){});
+				var status = {
+					status: "Present"
+				}
+				if(user.status.length == user.timein.length){
+					Time.addStatus(query, status, function(err, data){});
+				} else {
+					Time.updateStatus(status_query, status, function(err, data){});
+				}
 			}
-		} else {
-			var status = {
-				status: "Present"
-			}
-			if(user.status.length == user.timein.length){
-				Time.addStatus(query, status, function(err, data){});
-			} else {
-				Time.updateStatus(status_query, status, function(err, data){});
-			}
+			Time.addTimeIn(query, time, function(err, tin){});
 		}
-		Time.addTimeIn(query, time, function(err, tin){
-			res.redirect('/profile');
-		});
+		res.redirect('/profile');
 	});
 });
 
 //TimeOut
 router.post('/timeout/:dates/:tout', ensureAuthenticated,  function(req,res,next){
-	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, user){
-		let query = {user_id: req.user.id, date: req.params.dates};
-		var timeout = moment().format('HH:mm:ss');
-		var time = {
-			timeout: timeout
-		};
-		Time.addTimeOut(query, time, function(err, tin){
-			res.redirect('/profile');
-		});
+	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, log){
+		if(log.timein.length == log.timeout.length+1){
+			let query = {user_id: req.user.id, date: req.params.dates};
+			var timeout = moment().format('HH:mm:ss');
+			var time = {
+				timeout: timeout
+			};
+			if(log.breakin.length !== 0){
+				Time.addTimeOut(query, time, function(err, tin){});
+			} else {
+				var breakin = {
+					breakin: 'N/A'
+				}
+				var breakout = {
+					breakout: 'N/A'
+				}
+				Time.addBreakIn(query, breakin, function(err, bin){});
+				Time.addBreakOut(query, breakout, function(err, bout){});
+				Time.addTimeOut(query, time, function(err, tout){});
+			}
+		}
+		res.redirect('/profile');
 	});
 });
 
 //Break In
 router.post('/breakin/:dates/:tin', ensureAuthenticated,  function(req,res,next){
-	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, user){
-		let query = {user_id: req.user.id, date: req.params.dates};
-		var breakin = moment().format('HH:mm:ss');
-		var time = {
-			breakin: breakin
-		};
-		Time.addBreakIn(query, time, function(err, tin){
-			res.redirect('/profile');
-		});
+	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, log){
+		if(log.breakin.length == log.breakout.length){
+			let query = {user_id: req.user.id, date: req.params.dates};
+			var breakin = moment().format('HH:mm:ss');
+			var time = {
+				breakin: breakin
+			};
+			Time.addBreakIn(query, time, function(err, tin){});
+		}
+		res.redirect('/profile');
 	});
 });
 
 //Break Out
 router.post('/breakout/:dates/:tout', ensureAuthenticated,  function(req,res,next){
-	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, user){
-		let query = {user_id: req.user.id, date: req.params.dates};
-		var breakout = moment().format('HH:mm:ss');
-		var time = {
-			breakout: breakout
-		};
-		Time.addBreakOut(query, time, function(err, tin){
-			res.redirect('/profile');
-		});
+	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, log){
+		if(log.breakin.length == log.breakout.length+1){
+			let query = {user_id: req.user.id, date: req.params.dates};
+			var breakout = moment().format('HH:mm:ss');
+			var time = {
+				breakout: breakout
+			};
+			Time.addBreakOut(query, time, function(err, tin){});
+		}
+		res.redirect('/profile');
 	});
 });
 
 //Sick Leave
 router.post('/status/:dates', ensureAuthenticated,  function(req,res,next){
-	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, user){
+	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, log){
 		let query = {user_id: req.user.id, date: req.params.dates};
 		let status_query = {user_id: req.user.id, date: req.params.dates, 'status.status': 'Absent'};
 		var timein = {
@@ -209,6 +236,10 @@ router.post('/status/:dates', ensureAuthenticated,  function(req,res,next){
 		var timeout = {
 			timeout: "N/A"
 		}
+		var status = {
+			status: "Sick"
+		}
+		Time.updateStatus(status_query, status, function(err, data){});
 		Time.addTimeIn(query, timein, function(err, tin){});
 		Time.addBreakIn(query, breakin, function(err, bin){});
 		Time.addBreakOut(query, breakout, function(err, bout){});
@@ -238,10 +269,8 @@ router.post('/filter', ensureAuthenticated, function(req,res,next){
 //Delete Request
 router.post('/leave/form/delete/:leave_id', function(req,res,next){
 	let query = {_id: req.params.leave_id};
-	Request.delLeave(query, function(err, response){
 		if(err){return console.log(err);}
 			res.redirect('/profile/?tab=form');
-	});
 });
 
 //Request Leave
@@ -249,12 +278,11 @@ router.post('/leave/form', ensureAuthenticated, function(req,res,next){
 	if(req.body.leave){
 		var date = req.body.leave;
 	} else {
-		var error = "Date not specified";
-		res.redirect('/profile/?tab=form&error='+error);
+		req.flash('error_msg', "Date not specified");
+		res.redirect('/profile/?tab=form');
 	}
-	if(moment(date).format('MM-DD-YYYY') <= moment().add(14, 'd').format('MM-DD-YYYY')){
-		var error = "Can't request on that day";
-		res.redirect('/profile/?tab=form&error='+error);
+	if(moment(date).format('MM-DD-YYYY') <= moment().add(14, 'd').format('MM-DD-YYYY') || req.user.leave_count <= 0){
+		req.flash('error_msg', 'Reached Leave Limit')
 	} else {
 		var newRequest = new Request ({
 				date: moment().format('MM-DD-YYYY'),
@@ -268,11 +296,10 @@ router.post('/leave/form', ensureAuthenticated, function(req,res,next){
 			if(err){
 				console.log(err);
 			}
-			res.redirect('/profile');
 		});
 		Wuser.getUsersByTeam(req.user.team, function(err, users){
 			users.forEach(function(user){
-				if(user.position !== 'User'){
+				if((user.position == 'Manager' && user.department == req.user.department) || user.department == 'Head'){
 					var transporter = nodemailer.createTransport({
 						service:'Gmail',
 						auth: {
@@ -290,12 +317,12 @@ router.post('/leave/form', ensureAuthenticated, function(req,res,next){
 					}
 					transporter.sendMail(mailOptions,function(error,info){
 						if(error){return console.log(error);}
-						res.redirect('/profile');
 					});
 				}
 			});
 		});
 	}
+	res.redirect('/profile/?tab=form');
 });
 
 //Settings Tab
@@ -384,7 +411,8 @@ router.post('/', ensureAuthenticated, function(req,res,next){
 			username: username,
 			email: email,
 			password: password,
-			position: position
+			position: position,
+			leave_count: req.user.leave_count
 		}
 		let query = {_id: req.user.id}
 		Wuser.getUserById(req.user.id, function(err, user){

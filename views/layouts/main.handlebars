@@ -142,18 +142,18 @@
 			    </li>
             	<li><a href="/profile">Profile</a></li>
             	<li><a href="/dashboard">Dashboard</a></li>
-				{{#ifCond wuser.department '==' 'Head'}}
+				{{#equal wuser.department 'Head'}}
             		<li><a href="/report">Report</a></li>
             		<li><a href="/create">Create Users</a></li>
             		<li><a href="/admin">Admin</a></li>
 				{{else}}
-					{{#ifCond wuser.position '==' 'Manager'}}
+					{{#equal wuser.position 'Manager'}}
 	            		<li><a href="/report">Report</a></li>
 	            		<li><a href="/create">Create Users</a></li>
 	            		<li><a href="/admin">Admin</a></li>
 					{{else}}
-            		{{/ifCond}}
-            	{{/ifCond}}
+            		{{/equal}}
+            	{{/equal}}
             	<li><a href="/logout">Logout</a></li>
           	{{else}}
             	<li><a href="/login">Login</a></li>

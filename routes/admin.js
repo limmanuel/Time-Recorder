@@ -21,37 +21,27 @@ router.get('/', ensureAuthenticated, function (req,res,next){
 	if(req.user.position !== 'Manager' && req.user.department !== 'Head'){
 		res.redirect('/profile');
 	} else {
-		var error;
-		var errors;
-		if(req.query.error){
-			error = req.query.error
-		}
-		if(req.query.errors){
-			errors = req.query.errors
-		}
 		if(req.query.tab) {
 			var tab = req.query.tab;
 		} else {
 			var tab = 'User';
 		}
 		Account.getAccountByTeam(req.user.team, function(err,team){
-				Wuser.getUsersByTeam(req.user.team, function(err, users){
-					Time.getTimeLogsByTeam(req.user.team, function(err,logs){
-						res.render('admin', {
-							page: 'admin',
-							tab: tab,
-							dates: moment().format('MM-DD-YYYY'),
-							time: moment().format('HH:mm:ss'),
-							wuser: req.user,
-							user: users,
-							user_id: req.user.id,
-							team: team,
-							logs: logs,
-							error: error,
-							errors: errors
-						});
+			Wuser.getUsersByTeam(req.user.team, function(err, users){
+				Time.getTimeLogsByTeam(req.user.team, function(err,logs){
+					res.render('admin', {
+						page: 'admin',
+						tab: tab,
+						dates: moment().format('MM-DD-YYYY'),
+						time: moment().format('HH:mm:ss'),
+						wuser: req.user,
+						user: users,
+						user_id: req.user.id,
+						team: team,
+						logs: logs
 					});
 				});
+			});
 		});
 	}
 });
@@ -59,27 +49,15 @@ router.get('/', ensureAuthenticated, function (req,res,next){
 //Manage User
 //Update Position
 router.post('/user/update/:user_id', ensureAuthenticated, function (req,res,next){
-	var first_name = req.body.fname;
-	var last_name = req.body.lname;
-	var username = req.body.username;
-	var email = req.body.email;
-	var team = req.body.team;
-	var department = req.body.department;
-	var position = req.body.position;
-	var password = req.body.password;
-
-	req.checkBody('fname', 'First Name is required').notEmpty();
-	req.checkBody('lname', 'Last Name is required').notEmpty();
-	req.checkBody('username', 'Username is required').notEmpty();
-	req.checkBody('team', 'Team is required').notEmpty();
-	req.checkBody('email', 'Email is required').isEmail();
-	req.checkBody('password2', 'Passwords do not match').equals(password);
-
-	let errors = req.validationErrors();
-
-	if(errors){
-		res.redirect('/admin/?tab=User&errors='+errors);
-	} else {
+	Wuser.getUserById(req.params.user_id, function(err, user){
+		var first_name = req.body.fname;
+		var last_name = req.body.lname;
+		var username = req.body.username;
+		var email = req.body.email;
+		var team = req.body.team;
+		var department = req.body.department;
+		var position = req.body.position;
+		var password = req.body.password;
 		var updateWuser = {
 			team: team,
 			first_name: first_name,
@@ -88,20 +66,36 @@ router.post('/user/update/:user_id', ensureAuthenticated, function (req,res,next
 			email: email,
 			password: password,
 			department: department,
-			position: position
+			position: position,
+			leave_count: user.leave_count
 		}
 		let query = {_id: req.params.user_id}
-		Wuser.getUserById(req.params.user_id, function(err, user){
-			var last_password = user.password;
-			Wuser.updateUser(last_password, query, updateWuser, function(err, val){
-				if(err){
-					console.log(err)
-				}
-				req.flash('success_msg', 'You updated a User')
-				res.redirect('/admin/?tab=User');
-			});
+		var last_password = user.password;
+		Wuser.updateUser(last_password, query, updateWuser, function(err, val){
+			if(err){
+				console.log(err)
+			}
+			req.flash('success_msg', 'You updated a User')
+			res.redirect('/admin/?tab=User');
 		});
-	}
+	});
+});
+
+//Add Allowed Leave
+router.post('/user/add_leave/:user_id', function(req,res,next){
+	Wuser.getUserById(req.params.user_id, function(err, user){
+		let query = {user_id: user.id}
+		let user_query = {_id: user.id}
+		var count = user.leave_count;
+		count = count + req.body.count;
+		var leave_count = {
+			leave_count: count
+		}
+		Wuser.updateLeaveCount(user_query, leave_count, function(err, leave){});
+		Request.delLeave(query, function(err, response){
+			res.redirect('/admin/?tab=User');
+		});
+	});
 });
 
 //Delete User
@@ -139,9 +133,25 @@ router.post('/department/create', function(req,res,next){
 router.post('/department/delete/:dept_id', function(req,res,next){
 	let query = {team: req.user.team};
 	var dept_id = req.params.dept_id;
-	Account.delDepartment(query,dept_id,function(err,dept){
-		res.redirect('/admin?tab=Department')
+	var last_dept = req.body.last_dept;
+	var dept = req.body.department;
+	var pos = req.body.position;
+	var department = {
+		department: dept,
+		position: pos
+	}
+	if(dept !== last_dept){
+	Wuser.getUsersByTeam(req.user.team, function(err, users){
+		users.forEach(function(user){
+			if(user.department == last_dept){
+				let uquery = {_id: user.id};
+				Wuser.updateDepartment(uquery, department, function(err, data){});
+			}
+		});
 	});
+		Account.delDepartment(query,dept_id,function(err,dept){});
+	}
+	res.redirect('/admin?tab=Department');
 });
 
 //add position
@@ -158,11 +168,26 @@ router.post('/department/add/position', function(req,res,next){
 });
 
 //delete Position
-router.post('/department/delete/position/:pos_id', function(req,res,next){
-	let query = {team: req.user.team};
+router.post('/delete/position/:pos_id', function(req,res,next){
 	var pos_id = req.params.pos_id;
-	Account.delPosition(query,pos_id,function(err,pos){
-		res.redirect('/admin?tab=Department')
+	var dept = req.body.department;
+	var last_pos = req.body.last_pos;
+	var pos = req.body.position;
+	let query = {team: req.user.team, departments: {$elemMatch: {department: dept}}}
+	var department = {
+		department: dept,
+		position: pos
+	}
+	Wuser.getUsersByTeam(req.user.team, function(err, users){
+		users.forEach(function(user){
+			if(user.department == dept && user.position == last_pos){
+				let uquery = {_id: user.id};
+				Wuser.updateDepartment(uquery, department, function(err, data){});
+			}
+		});
+	});
+	Account.delPosition(query,pos_id,function(err,dept){
+		res.redirect('/admin?tab=Department');
 	});
 });
 
@@ -215,7 +240,8 @@ router.post('/settings/update', ensureAuthenticated, function (req,res,next){
 					});
 			});
 		} else if(err){
-			res.redirect('/admin/?tab=Account&error='+err);
+			req.flash('error_msg', err);
+			res.redirect('/admin/?tab=Account');
 		} else {
 			var query = {team: last_team};
 			var updateAccount = {
@@ -308,10 +334,21 @@ router.post('/settings/holiday/add', ensureAuthenticated,  function(req,res,next
 //Delete Holiday
 router.post('/settings/delete/holiday/:holiday_id', function(req,res,next){
 	let query = {team: req.user.team};
-	Account.delHoliday(query, req.params.holiday_id, function(err, response){
-		if(err){return console.log(err);}
-			res.redirect('/admin/?tab=Account');
+	Account.delHoliday(query, req.params.holiday_id, function(err, response){});
+	Time.getTimeLogsByTeam(req.user.team, function(err, logs){
+		logs.forEach(function(log){
+			var hdate = req.body.hdate;
+			var ldate = log.date;
+			if(ldate == hdate){
+					console.log(log._id);
+				let lquery = {_id: log._id}
+				Time.deleteLog(query, function(err, del){
+					console.log(del)
+				});
+			}
+		});
 	});
+	res.redirect('/admin/?tab=Account');
 });
 
 //Authentication

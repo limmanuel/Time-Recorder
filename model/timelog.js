@@ -127,6 +127,10 @@ module.exports.deleteUser = function(query, callback){
 	TimeLog.delete(query,callback);
 }
 
+module.exports.deleteLog = function(query, callback){
+	TimeLog.remove(query,callback);
+}
+
 module.exports.updateTeam = function(query, team, callback){
 	TimeLog.update(query, {$set: team}, callback);
 }
