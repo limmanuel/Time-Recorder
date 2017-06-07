@@ -98,7 +98,7 @@
 					<b>Time Out: </b>
 			{{#each ../../log}}
 				{{#equal user_id ../id}}
-					{{#each log.timeout}}
+					{{#each timeout}}
 						{{#equal (addOne @index) ../timein.length}}
 							{{#equal timeout 'N/A'}}
 								{{timeout}}
