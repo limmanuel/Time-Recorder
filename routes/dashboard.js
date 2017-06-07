@@ -41,60 +41,60 @@ router.get('/', ensureAuthenticated, function (req,res,next){
 	var hours_spent=[];
 	var arr = {};
 	Account.getAccountByTeam(req.user.team, function(err,team){
-			Wuser.getUsersByTeam(req.user.team, function(err, users){
-				Time.getTimeLogsByTeam(req.user.team, function(err, logs){
-					Time.getTimeLogsByDate(moment().format('MM-DD-YYYY'), req.user.team, function(err, log){
-						Request.getRequestByTeam(req.user.team, function(err, forms){
-							logs.forEach(function(val){
-								var bms = 0;
-								var tms = 0;
-								var name = val.name;
-								var bdate=val.date;
-								var d;
-							val.timeout.forEach(function(tout, index){
-								if(val.breakout){
-									val.breakout.forEach(function(bout, ind){
-										if(bout.breakout !== 'N/A'){						
-											var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(val.breakin[ind].breakout,"HH:mm:ss"));
-											bms=bms+breakms;
-										}
-									});
-								}
-								if(tout.timeout !== 'N/A' && val.timein[index] && tout){						
-									var timems = moment(tout.timeout,"HH:mm:ss").diff(moment(val.timein[index].timein,"HH:mm:ss"));
-									tms=tms+timems;
-								}
-							});
-							ms = tms - bms;
-							bd = moment.duration(bms).format("HH:mm:ss");
-							if(ms > 0){
-								d = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+		Wuser.getUsersByTeam(req.user.team, function(err, users){
+			Time.getTimeLogsByTeam(req.user.team, function(err, logs){
+				Time.getTimeLogsByDate(moment().format('MM-DD-YYYY'), req.user.team, function(err, log){
+					Request.getRequestByTeam(req.user.team, function(err, forms){
+						logs.forEach(function(val){
+							var bms = 0;
+							var tms = 0;
+							var name = val.name;
+							var bdate=val.date;
+							var d;
+						val.timeout.forEach(function(tout, index){
+							if(val.breakout){
+								val.breakout.forEach(function(bout, ind){
+									if(bout.breakout !== 'N/A'){						
+										var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(val.breakin[ind].breakout,"HH:mm:ss"));
+										bms=bms+breakms;
+									}
+								});
 							}
-							arr = {hours: d, date:bdate, name: name}
-							hours_spent.push(arr);
-							});
-							res.render('dashboard', {
-								page: 'dashboard',
-								tab: tab,
-								moment: moment,
-								datepicker: datepicker,
-								dates: moment().format('MM-DD-YYYY'),
-								time: moment().format('HH:mm:ss'),
-								wuser: req.user,
-								user: users,
-								user_id: req.user.id,
-								log: log,
-								logs: logs,
-								team: team,
-								filterStatus: filterStatus,
-								filterMonth: filterMonth,
-								hours_spent: hours_spent,
-								forms: forms
-							});
+							if(tout.timeout !== 'N/A' && val.timein[index] && tout){						
+								var timems = moment(tout.timeout,"HH:mm:ss").diff(moment(val.timein[index].timein,"HH:mm:ss"));
+								tms=tms+timems;
+							}
+						});
+						ms = tms - bms;
+						bd = moment.duration(bms).format("HH:mm:ss");
+						if(ms > 0){
+							d = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+						}
+						arr = {hours: d, date:bdate, name: name}
+						hours_spent.push(arr);
+						});
+						res.render('dashboard', {
+							page: 'dashboard',
+							tab: tab,
+							moment: moment,
+							datepicker: datepicker,
+							dates: moment().format('MM-DD-YYYY'),
+							time: moment().format('HH:mm:ss'),
+							wuser: req.user,
+							user: users,
+							user_id: req.user.id,
+							log: log,
+							logs: logs,
+							team: team,
+							filterStatus: filterStatus,
+							filterMonth: filterMonth,
+							hours_spent: hours_spent,
+							forms: forms
 						});
 					});
 				});
 			});
+		});
 	});
 });
 

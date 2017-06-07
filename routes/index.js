@@ -9,12 +9,153 @@ var nodemailer = require('nodemailer');
 var json2csv = require('json2csv');
 var fs = require('fs');
 var path = require('path');
+var cron = require('node-cron');
 
 //Mongoose Schema
 let Account = require('../model/account.js');
 let Wuser = require('../model/user.js');
 let Time = require('../model/timelog.js');
 let Request = require('../model/request.js');
+
+cron.schedule('*/5 * * * * *', function(){
+	Account.getAccounts(function(err, accounts){
+		accounts.forEach(function(account){
+			if(account !== null && account!== undefined){
+				var team = account.team;
+				Wuser.getUsersByTeam(team,function(err, users){
+					users.forEach(function(user){
+						if(user !== null && user!== undefined){
+							var userid = user._id;
+							var name = user.first_name+' '+user.last_name;
+							Time.getTimeLogsByUser(userid, function(err, logs){
+								var t = 0;
+								var l = 0;
+								var h = 0;
+								var h_date = [];
+								var date_now = moment().format('MM-DD-YYYY');
+								var date_yes = moment().subtract(1,'d').format('MM-DD-YYYY');
+								var year = moment().format('-YYYY');
+								logs.forEach(function(log){
+									if(log.date == date_now){
+										l=1;
+									}
+									if(log.date == date_yes){
+										if(log.timeout.length > 0){
+											t=1;
+										}
+									}
+									account.holiday.forEach(function(holidays){
+										if(log.date == (holidays.date+year)){
+											h=1;
+										} else {
+											h_date.push(holidays.date);
+										}
+									});
+								});
+								if(t == 0){
+									let query = {user_id: userid, date: date_yes}
+									var time = {
+										timeout: account.sched_out+':00'
+									}
+									Time.addTimeOut(query, time, function(err, data){});
+								}
+								if(h == 0){
+									h_date.forEach(function(date){
+										var holiday_date = date;
+										var newLog = new Time ({
+											date: holiday_date+year,
+											team: team,
+											user_id: user._id,
+											name: user.first_name + ' ' + user.last_name,
+											status: {
+												status: "Holiday"
+											},
+											timein: {
+												timein: "N/A"
+											},
+											breakin: {
+												breakin: "N/A"
+											},
+											breakout: {
+												breakout: "N/A"
+											},
+											timeout: {
+												timeout: "N/A"
+											}
+										});
+										newLog.save(function(err){
+											if(err){
+												console.log(err);
+											}
+											h=0;
+										});
+									});
+								}
+								if(l == 0){
+									var newLog = new Time ({
+										date: date_now,
+										team: team,
+										user_id: userid,
+										name: name,
+										timein: [],
+										timeout: [],
+										breakin: [],
+										breakout: [],
+										status: []
+									});
+									newLog.save(function(err){
+										if(err){
+											console.log(err);
+										}
+										let query = {user_id: userid, date: moment().format('MM-DD-YYYY')}
+										var sched_in = account.sched_in+':00';
+										var time = moment().format('HH:MM:ss');
+										if(time >= sched_in){
+											var status = {
+												status: "Absent"
+											}
+										} else {
+											var status = {
+												status: "Absent"
+											}
+										}
+										Time.addStatus(query, status, function(err, data){});
+										l=1;
+									});
+								}
+								var sched_out = account.sched_out+':00';
+								var time = moment().format('HH:MM:ss');
+								if(time >= sched_out){
+									Time.getTimeLogsByUserAndDate(userid, moment().format('MM-DD-YYYY'), function(err, user){
+										if(user.timein[0]){} else{
+											let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': 'Absent'};
+											var timein = {
+												timein: "N/A"
+											}
+											var breakin = {
+												breakin: "N/A"
+											}
+											var breakout = {
+												breakout: "N/A"
+											}
+											var timeout = {
+												timeout: "N/A"
+											}
+											Time.addTimeIn(query, timein, function(err, tin){});
+											Time.addBreakIn(query, breakin, function(err, bin){});
+											Time.addBreakOut(query, breakout, function(err, bout){});
+											Time.addTimeOut(query, timeout, function(err, tout){});
+										}
+									});
+								}
+							});
+						}
+					});
+				});
+			}
+		});
+	});
+});
 
 router.get('/', function(req,res,next){
 	res.redirect('/login')
@@ -128,133 +269,6 @@ router.post('/register', function(req,res,next){
 //Login Page Add Current Date Time Log and Update Approved Leave Request
 router.get('/login', function(req,res,next){
 	Account.getAccounts(function(err, accounts){
-		accounts.forEach(function(account){
-			if(account !== null && account!== undefined){
-				var team = account.team;
-				Wuser.getUsersByTeam(team,function(err, users){
-					users.forEach(function(user){
-						if(user !== null && user!== undefined){
-							var userid = user._id;
-							var name = user.first_name+' '+user.last_name;
-							Time.getTimeLogsByUser(userid, function(err, logs){
-								var t = 0;
-								var l = 0;
-								var h = 0;
-								var h_date = [];
-								var date_now = moment().format('MM-DD-YYYY');
-								var date_yes = moment().subtract(1,'d').format('MM-DD-YYYY');
-								var year = moment().format('-YYYY');
-								logs.forEach(function(log){
-									if(log.date == date_now){
-										l=1;
-									}
-									if(log.date == date_yes){
-										if(log.timeout.length > 0){
-											t=1;
-										}
-									}
-									account.holiday.forEach(function(holidays){
-										if(log.date == (holidays.date+year)){
-											h=1;
-										} else {
-											h_date.push(holidays.date);
-										}
-									});
-								});
-								if(t == 0){
-									let query = {user_id: userid, date: date_yes}
-									var time = {
-										timeout: account.sched_out+':00'
-									}
-									Time.addTimeOut(query, time, function(err, data){});
-								}
-								if(h == 0){
-									h_date.forEach(function(date){
-										var holiday_date = date;
-										var newLog = new Time ({
-											date: holiday_date+year,
-											team: team,
-											user_id: user._id,
-											name: user.first_name + ' ' + user.last_name,
-											status: {
-												status: "Holiday"
-											},
-											timein: {
-												timein: "N/A"
-											},
-											breakin: {
-												breakin: "N/A"
-											},
-											breakout: {
-												breakout: "N/A"
-											},
-											timeout: {
-												timeout: "N/A"
-											}
-										});
-										newLog.save(function(err){
-											if(err){
-												console.log(err);
-											}
-											h=0;
-										});
-									});
-								}
-								if(l == 0){
-									var newLog = new Time ({
-										date: date_now,
-										team: team,
-										user_id: userid,
-										name: name,
-										timein: [],
-										timeout: [],
-										breakin: [],
-										breakout: [],
-										status: []
-									});
-									newLog.save(function(err){
-										if(err){
-											console.log(err);
-										}
-										let query = {user_id: userid, date: moment().format('MM-DD-YYYY')}
-										var status = {
-											status: "Absent"
-										}
-										Time.addStatus(query, status, function(err, data){});
-										l=1;
-									});
-								}
-								var sched = account.sched_out+':00';
-								var time = moment().format('HH:MM:ss');
-								if(time >= sched){
-									Time.getTimeLogsByUserAndDate(userid, moment().format('MM-DD-YYYY'), function(err, user){
-										if(user.timein[0]){} else{
-											let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': 'Absent'};
-											var timein = {
-												timein: "N/A"
-											}
-											var breakin = {
-												breakin: "N/A"
-											}
-											var breakout = {
-												breakout: "N/A"
-											}
-											var timeout = {
-												timeout: "N/A"
-											}
-											Time.addTimeIn(query, timein, function(err, tin){});
-											Time.addBreakIn(query, breakin, function(err, bin){});
-											Time.addBreakOut(query, breakout, function(err, bout){});
-											Time.addTimeOut(query, timeout, function(err, tout){});
-										}
-									});
-								}
-							});
-						}
-					});
-				});
-			}
-		});
 		if(err){
 			console.log(err);
 		}

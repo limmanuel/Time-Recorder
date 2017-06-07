@@ -62,7 +62,7 @@ module.exports.updateLeave = function(query, status, callback){
 }
 
 module.exports.deleteUser = function(query, callback){
-	Request.delete(query,callback);
+	Request.remove(query,callback);
 }
 
 module.exports.updateTeam = function(query, team, callback){

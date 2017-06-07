@@ -91,7 +91,7 @@ module.exports.getUserById = function(id, callback){
 }
 
 module.exports.deleteUser = function(query, callback){
-	Wuser.deleteOne(query,callback);
+	Wuser.remove(query,callback);
 }
 
 module.exports.updateTeam = function(query, team, callback){

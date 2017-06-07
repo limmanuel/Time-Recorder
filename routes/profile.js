@@ -334,6 +334,7 @@ router.post('/', ensureAuthenticated, function(req,res,next){
 	var email = req.body.email;
 	var team = req.body.team;
 	var position = req.body.position;
+	var department = req.body.department;
 	var password = req.body.password;
 	var password2 = req.body.password2;
 	var image = req.body.image;
@@ -412,6 +413,7 @@ router.post('/', ensureAuthenticated, function(req,res,next){
 			email: email,
 			password: password,
 			position: position,
+			department: department,
 			leave_count: req.user.leave_count
 		}
 		let query = {_id: req.user.id}

@@ -124,7 +124,7 @@ module.exports.updateStatus = function(query, status, callback){
 }
 
 module.exports.deleteUser = function(query, callback){
-	TimeLog.delete(query,callback);
+	TimeLog.remove(query,callback);
 }
 
 module.exports.deleteLog = function(query, callback){

@@ -34,7 +34,7 @@ router.get('/', ensureAuthenticated, function(req,res,next){
 					var absent_count = 0;
 					var sick_count = 0;
 					var vacation_count = 0;
-					var hours_spent = "00s";
+					var hours_spent = "";
 					var ms = 0;
 					var arr = {};
 					logs.forEach(function(log){
@@ -45,21 +45,25 @@ router.get('/', ensureAuthenticated, function(req,res,next){
 								var name = log.name;
 								var bdate=log.date;
 								var d;
-								log.timein.forEach(function(tin, index){
-									if(tin.timein !== 'N/A' && log.timeout[index] && tin){						
-										var timems = moment(log.timeout[index].timeout,"HH:mm:ss").diff(moment(tin.timein,"HH:mm:ss"));
-										tms=tms+timems;
-										log.breakin.forEach(function(bin, index){
-											if(bin.breakin !== 'N/A' && log.breakout[index] && bin){						
-												var breakms = moment(log.breakout[index].breakout,"HH:mm:ss").diff(moment(bin.breakin,"HH:mm:ss"));
+								log.timeout.forEach(function(tout, index){
+									if(log.breakout){
+										log.breakout.forEach(function(bout, ind){
+											if(bout.breakout !== 'N/A'){						
+												var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakout,"HH:mm:ss"));
 												bms=bms+breakms;
 											}
 										});
 									}
+									if(tout.timeout !== 'N/A' && log.timein[index] && tout){						
+										var timems = moment(tout.timeout,"HH:mm:ss").diff(moment(log.timein[index].timein,"HH:mm:ss"));
+										tms=tms+timems;
+									}
 								});
 								var milli = tms - bms;
-								ms=ms+milli;
-								hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+								ms = ms + milli;
+								if(ms > 0){
+									hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+								}
 								if(log.status[0].status == 'Present'){
 									present_count++;
 								}
@@ -149,21 +153,25 @@ router.post('/', ensureAuthenticated, function(req,res,next){
 										var name = log.name;
 										var bdate=log.date;
 										var d;
-										log.timein.forEach(function(tin, index){
-											if(tin.timein !== 'N/A' && log.timeout[index] && tin){						
-												var timems = moment(log.timeout[index].timeout,"HH:mm:ss").diff(moment(tin.timein,"HH:mm:ss"));
-												tms=tms+timems;
-												log.breakin.forEach(function(bin, index){
-													if(bin.breakin !== 'N/A' && log.breakout[index] && bin){						
-														var breakms = moment(log.breakout[index].breakout,"HH:mm:ss").diff(moment(bin.breakin,"HH:mm:ss"));
+										log.timeout.forEach(function(tout, index){
+											if(log.breakout){
+												log.breakout.forEach(function(bout, ind){
+													if(bout.breakout !== 'N/A'){						
+														var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakout,"HH:mm:ss"));
 														bms=bms+breakms;
 													}
 												});
 											}
+											if(tout.timeout !== 'N/A' && log.timein[index] && tout){						
+												var timems = moment(tout.timeout,"HH:mm:ss").diff(moment(log.timein[index].timein,"HH:mm:ss"));
+												tms=tms+timems;
+											}
 										});
 										var milli = tms - bms;
-										ms=ms+milli;
-										hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+										ms = ms + milli;
+										if(ms > 0){
+											hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+										}
 										if(log.status[0].status == 'Present'){
 											present_count++;
 										}
@@ -239,21 +247,25 @@ router.post('/download', ensureAuthenticated, function(req,res,next){
 								var name = log.name;
 								var bdate=log.date;
 								var d;
-								log.timein.forEach(function(tin, index){
-									if(tin.timein !== 'N/A' && log.timeout[index] && tin){						
-										var timems = moment(log.timeout[index].timeout,"HH:mm:ss").diff(moment(tin.timein,"HH:mm:ss"));
-										tms=tms+timems;
-										log.breakin.forEach(function(bin, index){
-											if(bin.breakin !== 'N/A' && log.breakout[index] && bin){						
-												var breakms = moment(log.breakout[index].breakout,"HH:mm:ss").diff(moment(bin.breakin,"HH:mm:ss"));
+								log.timeout.forEach(function(tout, index){
+									if(log.breakout){
+										log.breakout.forEach(function(bout, ind){
+											if(bout.breakout !== 'N/A'){						
+												var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakout,"HH:mm:ss"));
 												bms=bms+breakms;
 											}
 										});
 									}
+									if(tout.timeout !== 'N/A' && log.timein[index] && tout){						
+										var timems = moment(tout.timeout,"HH:mm:ss").diff(moment(log.timein[index].timein,"HH:mm:ss"));
+										tms=tms+timems;
+									}
 								});
 								var milli = tms - bms;
-								ms=ms+milli;
-								hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+								ms = ms + milli;
+								if(ms > 0){
+									hours_spent = moment.duration(ms).format("HH[h] mm[m] ss[s]");
+								}
 								if(log.status[0].status == 'Present'){
 									present_count++;
 								}
