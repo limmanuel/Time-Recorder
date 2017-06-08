@@ -179,14 +179,15 @@
 		<div class="container">
 			{{{body}}}
 		</div>
-<p>Click the button to get your coordinates.</p>
 
 <button onclick="getLocation()">Geolocation</button>
 
-<h6 id="demo"></h6>
+<h6 name="demo"></h6>
+<h6>---------------</h6>
+<h6 name="demo"></h6>
 
 <script>
-var x = document.getElementById("demo");
+var x = document.getElementByName("demo");
 
 function getLocation() {
     if (navigator.geolocation) {
@@ -197,8 +198,8 @@ function getLocation() {
 }
 
 function showPosition(position) {
-    x.innerHTML = "Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude;
+    x.innerHTML = "Latitude: " + position.coords.latitude.toFixed(3) + 
+    "<br>Longitude: " + position.coords.longitude.toFixed(3);
 }
 </script>
 
