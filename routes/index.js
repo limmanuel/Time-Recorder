@@ -53,11 +53,39 @@ cron.schedule('*/5 * * * * *', function(){
 									});
 								});
 								if(t == 0){
-									let query = {user_id: userid, date: date_yes}
-									var time = {
-										timeout: account.sched_out+':00'
-									}
-									Time.addTimeOut(query, time, function(err, data){});
+									Time.getTimeLogsByUserAndDate(userid, date_yes, function(err, user){
+										let query = {user_id: userid, date: date_yes}
+										if(user.breakin.length > 0){
+											if(user.breakout.length == user.breakin.length){
+												var timeout = {
+													timeout: account.sched_out+':00'
+												}
+												Time.addTimeOut(query, timeout, function(err, tout){});
+											} else {
+												var breakout = {
+													breakout: user.breakin[user.breakin.length-1].breakin
+												}
+												var timeout = {
+													timeout: user.breakin[user.breakin.length-1].breakin
+												}
+												Time.addBreakOut(query, breakout, function(err, bout){});
+												Time.addTimeOut(query, timeout, function(err, tout){});
+											}
+										} else {
+											var breakin = {
+												breakin: 'N/A'
+											}
+											var breakout = {
+												breakout: 'N/A'
+											}
+											var timeout = {
+												timeout: account.sched_out+':00'
+											}
+											Time.addBreakIn(query, breakin, function(err, bin){});
+											Time.addBreakOut(query, breakout, function(err, bout){});
+											Time.addTimeOut(query, timeout, function(err, tout){});
+										}
+									});
 								}
 								if(h == 0){
 									h_date.forEach(function(date){

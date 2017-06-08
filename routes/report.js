@@ -49,7 +49,7 @@ router.get('/', ensureAuthenticated, function(req,res,next){
 									if(log.breakout){
 										log.breakout.forEach(function(bout, ind){
 											if(bout.breakout !== 'N/A'){						
-												var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakout,"HH:mm:ss"));
+												var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakin,"HH:mm:ss"));
 												bms=bms+breakms;
 											}
 										});
@@ -157,7 +157,7 @@ router.post('/', ensureAuthenticated, function(req,res,next){
 											if(log.breakout){
 												log.breakout.forEach(function(bout, ind){
 													if(bout.breakout !== 'N/A'){						
-														var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakout,"HH:mm:ss"));
+														var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakin,"HH:mm:ss"));
 														bms=bms+breakms;
 													}
 												});
@@ -251,7 +251,7 @@ router.post('/download', ensureAuthenticated, function(req,res,next){
 									if(log.breakout){
 										log.breakout.forEach(function(bout, ind){
 											if(bout.breakout !== 'N/A'){						
-												var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakout,"HH:mm:ss"));
+												var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(log.breakin[ind].breakin,"HH:mm:ss"));
 												bms=bms+breakms;
 											}
 										});
@@ -297,8 +297,8 @@ router.post('/download', ensureAuthenticated, function(req,res,next){
 					};
 					count.push(arr);
 				});
-				var fields = ['user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation', 'hours'];
-				var fieldNames = ['User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation', 'Hours Spent'];
+				var fields = ['null', 'user_id', 'name', 'present', 'late', 'absent', 'sick', 'vacation', 'hours'];
+				var fieldNames = [req.user.team, 'User Id', 'Name', 'Present', 'Late', 'Absent', 'Sick', 'Vacation', 'Hours Spent'];
 				var csv = json2csv({ data: count, fields: fields, fieldNames: fieldNames});
 				res.setHeader('Content-disposition', 'attachment; filename=report('+from+')to('+to+').csv');
 				res.set('Content-Type', 'text/csv');

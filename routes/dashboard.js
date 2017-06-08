@@ -55,7 +55,7 @@ router.get('/', ensureAuthenticated, function (req,res,next){
 							if(val.breakout){
 								val.breakout.forEach(function(bout, ind){
 									if(bout.breakout !== 'N/A'){						
-										var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(val.breakin[ind].breakout,"HH:mm:ss"));
+										var breakms = moment(bout.breakout,"HH:mm:ss").diff(moment(val.breakin[ind].breakin,"HH:mm:ss"));
 										bms=bms+breakms;
 									}
 								});
