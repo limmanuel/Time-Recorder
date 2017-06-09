@@ -46,6 +46,46 @@ router.get('/', ensureAuthenticated, function (req,res,next){
 	}
 });
 
+//Add Location
+router.post('/location/add', function(req,res,next){
+	var name = req.body.name;
+	var lati = req.body.lat;
+	var long = req.body.lon;
+
+	if(name && lati && long){
+		Account.getAccountByTeam(req.user.team,function(err, acc){
+			var l_name = "";
+			acc.locations.forEach(function(location){
+				var lon1 = location.lon + 0.005;
+				var lon2 = location.lon - 0.005;
+				var lat1 = location.lat + 0.005;
+				var lat2 = location.lat - 0.005;
+				if(lon1>=long<=lon2 && lat1>=lati<=lat2 && l_name==""){
+					l_name = location.location_name;
+				}
+			});console.log(l_name);
+			if(l_name == ""){
+				let query = {team: req.user.team}	
+				var location = {
+					location_name: name,
+					lon: long,
+					lat: lati
+				}
+				Account.addLocation(query,location,function(err,loc){});
+			}
+			if(l_name !== ""){
+				req.flash('error_msg', 'Location exist, You are currently at '+l_name);
+			} else {
+				req.flash('success_msg', name+' is added to locations');
+			}
+			res.redirect('/admin?tab=Location');
+		})
+	} else {
+		req.flash('error_msg', 'Missing Required Fields');
+		res.redirect('/admin?tab=Location');
+	}
+})
+
 //Manage User
 //Update Position
 router.post('/user/update/:user_id', ensureAuthenticated, function (req,res,next){
@@ -87,7 +127,8 @@ router.post('/user/add_leave/:user_id', function(req,res,next){
 		let query = {user_id: user.id}
 		let user_query = {_id: user.id}
 		var count = user.leave_count;
-		count = count + req.body.count;
+		var add_count = parseInt(req.body.count);
+		count = count + add_count;
 		var leave_count = {
 			leave_count: count
 		}

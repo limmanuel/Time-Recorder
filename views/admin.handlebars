@@ -24,32 +24,32 @@
 			</td>
 			<td>
 				<div id="dept{{id}}" class="modal">
-				<form method="post" action="/admin/user/update/{{id}}">
-				<input type="hidden" name="team" value="{{team}}">
-				<input class="form-control" type="hidden" name="fname" placeholder="First Name" value="{{first_name}}">
-				<input class="form-control" type="hidden" name="lname" placeholder=" Last Name" value="{{last_name}}">
-				<input class="form-control" type="hidden" name="email" placeholder="Email" value="{{email}}">
-				<input class="form-control" type="hidden" name="username" placeholder="Username" value="{{username}}">
-				<input class="form-control" type="hidden" name="password" placeholder="Password">
-				<input class="form-control" type="hidden" name="password2" placeholder="Password">
-				<input type="hidden" name="position" value="No Position">
-					<div class="modal-content">
-						<h6>Select new department</h6>
-						<select class="form-control browser-default" type="text" name="department">
-							{{#each ../team.departments}}
-								{{#equal ../department department}}
-									<option value="{{department}}" selected>{{department}}</option>
-								{{else}}
-									<option value="{{department}}">{{department}}</option>
-								{{/equal}}
-							{{/each}}
-						</select>
-					</div>
-					<div class="modal-footer">
-						<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Update</button>
-						<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
-					</div>
-				</form>
+					<form method="post" action="/admin/user/update/{{id}}">
+						<input type="hidden" name="team" value="{{team}}">
+						<input class="form-control" type="hidden" name="fname" placeholder="First Name" value="{{first_name}}">
+						<input class="form-control" type="hidden" name="lname" placeholder=" Last Name" value="{{last_name}}">
+						<input class="form-control" type="hidden" name="email" placeholder="Email" value="{{email}}">
+						<input class="form-control" type="hidden" name="username" placeholder="Username" value="{{username}}">
+						<input class="form-control" type="hidden" name="password" placeholder="Password">
+						<input class="form-control" type="hidden" name="password2" placeholder="Password">
+						<input type="hidden" name="position" value="No Position">
+						<div class="modal-content">
+							<h6>Select new department</h6>
+							<select class="form-control browser-default" type="text" name="department">
+								{{#each ../team.departments}}
+									{{#equal ../department department}}
+										<option value="{{department}}" selected>{{department}}</option>
+									{{else}}
+										<option value="{{department}}">{{department}}</option>
+									{{/equal}}
+								{{/each}}
+							</select>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Update</button>
+							<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+						</div>
+					</form>
 				</div>
 				{{#ifCond position '!==' 'CEO'}}
 					{{#ifCond ../wuser.department '==' 'Head'}}
@@ -68,40 +68,40 @@
 					<p class="btn-flat col s12 center-align">{{position}}</p>
 				{{/ifCond}}
 				<div id="pos{{id}}" class="modal">
-				<form method="post" action="/admin/user/update/{{id}}">
-				<input type="hidden" name="team" value="{{team}}">
-				<input class="form-control" type="hidden" name="fname" placeholder="First Name" value="{{first_name}}">
-				<input class="form-control" type="hidden" name="lname" placeholder=" Last Name" value="{{last_name}}">
-				<input class="form-control" type="hidden" name="email" placeholder="Email" value="{{email}}">
-				<input class="form-control" type="hidden" name="username" placeholder="Username" value="{{username}}">
-				<input class="form-control" type="hidden" name="password" placeholder="Password">
-				<input class="form-control" type="hidden" name="password2" placeholder="Password">
-				<input type="hidden" name="department" value="{{department}}">
-					<div class="modal-content">
-						<h6>Select new position</h6>
-						<div class="form-group">
-							<label>Position:</label>
-							<select class="form-control browser-default" type="text" name="position">
-								<option value="No Position">No Position</option>
-								{{#each ../team.departments}}
-									{{#equal department ../department}}
-										{{#each positions}}
-											{{#equal position 'CEO'}}
-											{{else}}
-												<option value="{{position}}">{{position}}</option>
-											{{/equal}}
-										{{/each}}
-									{{/equal}}
-								{{/each}}
-							</select>
-							<input type="hidden" name="dept_name" value="{{department}}">
+					<form method="post" action="/admin/user/update/{{id}}">
+						<input type="hidden" name="team" value="{{team}}">
+						<input class="form-control" type="hidden" name="fname" placeholder="First Name" value="{{first_name}}">
+						<input class="form-control" type="hidden" name="lname" placeholder=" Last Name" value="{{last_name}}">
+						<input class="form-control" type="hidden" name="email" placeholder="Email" value="{{email}}">
+						<input class="form-control" type="hidden" name="username" placeholder="Username" value="{{username}}">
+						<input class="form-control" type="hidden" name="password" placeholder="Password">
+						<input class="form-control" type="hidden" name="password2" placeholder="Password">
+						<input type="hidden" name="department" value="{{department}}">
+						<div class="modal-content">
+							<h6>Select new position</h6>
+							<div class="form-group">
+								<label>Position:</label>
+								<select class="form-control browser-default" type="text" name="position">
+									<option value="No Position">No Position</option>
+									{{#each ../team.departments}}
+										{{#equal department ../department}}
+											{{#each positions}}
+												{{#equal position 'CEO'}}
+												{{else}}
+													<option value="{{position}}">{{position}}</option>
+												{{/equal}}
+											{{/each}}
+										{{/equal}}
+									{{/each}}
+								</select>
+								<input type="hidden" name="dept_name" value="{{department}}">
+							</div>
 						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Update</button>
-						<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
-					</div>
-				</form>
+						<div class="modal-footer">
+							<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Update</button>
+							<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+						</div>
+					</form>
 				</div>
 			</td>
 			<td>
@@ -229,6 +229,45 @@
 	</div>
 </div>
 
+<div id="Location" class="col s12 row">
+<h3>Locations</h3>
+<table>
+<tr>
+	<th>Location</th>
+	<th>Longitude</th>
+	<th>Latitude</th>
+</tr>
+{{#each team.locations}}
+<tr>
+	<td>{{location_name}}</td>
+	<td>{{lon}}</td>
+	<td>{{lat}}</td>
+</tr>
+{{/each}}
+<tr>
+	<td>
+		<button class="btn-flat s12" onclick="getLocation()"  data-target="add_location">Add Location</button>
+	</td>
+</tr>
+</table>
+<div id="add_location" class="modal">
+	<form method="post" action="/admin/location/add">
+		<div class="modal-content">
+			<h5>Add Current Location</h5>
+				<label>Location Name:</label>
+				<input type="text" name="name" placeholder="Location Name">
+				<label>Latitude: </label>
+				<input type="text" class="latitude" name="lat" placeholder="Latitude" readonly>
+				<label>Longitude:</label>
+				<input type="text" class="longitude" name="lon" placeholder="Longitude" readonly>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="waves-effect waves-light btn col m6 modal-action modal-close">Add</button>
+			<a type="button" href="#!" class="waves-effect waves-light btn col m6 red modal-close">Cancel</a>
+		</div>
+	</form>
+</div>
+</div>
 <div id="Account" class="col s12">
 <div class="row col s12">
 	<h3>Account Settings</h3>

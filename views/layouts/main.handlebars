@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="/css/style.css">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	</head>
-	<body onload="updateClock(); setInterval('updateClock()', 1000 )">
+	<body onload="updateClock(); setInterval('updateClock()', 1000);getLocation(); setInterval('getLocation()', 1000);">
 		<div class="navbar-fixed">
 			<nav class="nav-extended">
 		      <div class="nav-wrapper grey darken-3">
@@ -112,6 +112,11 @@
 					{{else}}
 						<li class="tab"><a href="#Department">Departments/Positions</a></li>
 					{{/equal}}
+			      	{{#equal tab 'Location'}}
+						<li class="tab"><a class="active" href="#Location">Location</a></li>
+					{{else}}
+						<li class="tab"><a href="#Location">Location</a></li>
+					{{/equal}}
 			      	{{#equal tab 'Account'}}
 						<li class="tab"><a class="active" href="#Account">Account Settings</a></li>
 					{{else}}
@@ -180,26 +185,26 @@
 			{{{body}}}
 		</div>
 
-<button onclick="getLocation()">Geolocation</button>
-
-<h6 class="demo"></h6>
-<h6>---------------</h6>
-<h6 class="demo"></h6>
 
 <script>
-var x = document.getElementByClassName("demo");
+var x = document.getElementsByClassName("longitude");
+var y = document.getElementsByClassName("latitude");
 
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
     } else { 
-        x.innerHTML = "Geolocation is not supported by this browser.";
+	    for(var i=0 ; i<x.length ; i++){
+		    x[i].value = "Geolocation is not supported";
+		    y[i].value = "by this browser.";
+		}
     }
 }
 
 function showPosition(position) {
     for(var i=0 ; i<x.length ; i++){
-	    x[i].innerHTML = "Latitude: " + position.coords.latitude.toFixed(3) + "<br>Longitude: " + position.coords.longitude.toFixed(3);
+	    x[i].value = position.coords.longitude.toFixed(5);
+	    y[i].value = position.coords.latitude.toFixed(5);
 	}
 }
 </script>

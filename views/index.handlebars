@@ -175,6 +175,8 @@
 			<button type="submit" id="tin" class="waves-effect waves-light btn-large col s12 blue darken-1">Time In</button>
 		{{/if}}
 				<div class="form-group">
+					<input type="hidden" class="latitude" name="lat" placeholder="Latitude">
+					<input type="hidden" class="longitude" name="lon" placeholder="Longitude">
 					<input class="form-control" type="hidden" name="dates" value="{{dates}}">
 					<input id="time" class="form-control" type="hidden" name="time">
 					<input id="last_date" class="form-control" type="hidden" name="last_date">
@@ -228,6 +230,7 @@
 	<table class="bordered col s12">
 		<tr>
 			<th>Date</th>
+			<th>Location</th>
 			<th>Time In</th>
 			<th>Start Break</th>
 			<th>End Break</th>
@@ -244,6 +247,15 @@
 								<tr>
 									<td>
 										{{moment ../../date 'MMM DD YYYY'}}
+									</td>
+									<td>
+										{{#each ../../timein}}
+												{{#equal timein 'N/A'}}
+													{{timein}}
+												{{else}}
+													{{location}}<br>
+												{{/equal}}
+										{{/each}}
 									</td>
 									<td>
 										{{#each ../../timein}}

@@ -14,8 +14,14 @@ var timelogSchema = new mongoose.Schema({
 	name: {
 		type: String
 	},
+	location: {
+		type: String
+	},
 	timein: [{
 		timein: {
+			type: String
+		},
+		location: {
 			type: String
 		}
 	}],

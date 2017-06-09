@@ -252,6 +252,7 @@
 	<tr>
 		<th>Name</th>
 		<th>Date</th>
+		<th>Location</th>
 		<th>Time In</th>
 		<th>Start Break</th>
 		<th>End Break</th>
@@ -272,6 +273,15 @@
 								</td>
 								<td>
 									{{moment ../../../date 'MMM DD YYYY'}}
+								</td>
+								<td>
+									{{#each ../../../timein}}
+											{{#equal timein 'N/A'}}
+												{{timein}}
+											{{else}}
+												{{location}}<br>
+											{{/equal}}
+									{{/each}}
 								</td>
 								<td>
 									{{#each ../../../timein}}

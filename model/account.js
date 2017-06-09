@@ -12,6 +12,17 @@ var accountSchema = mongoose.Schema({
 	sched_out: {
 		type: String
 	},
+	locations: [{
+		location_name: {
+			type: String
+		},
+		lon: {
+			type: Number
+		},
+		lat: {
+			type: Number
+		}
+	}],
 	departments: [{
 		department: {
 			type: String
@@ -101,6 +112,15 @@ module.exports.delPosition = function(query, id, callback){
 	Account.findOneAndUpdate(query, {
 		$pull: { 
 			'departments.$.positions': {_id: id}
+		}
+	}, callback)
+}
+
+
+module.exports.addLocation = function(query, location, callback){
+	Account.findOneAndUpdate(query, {
+		$push: { 
+			locations: location
 		}
 	}, callback)
 }

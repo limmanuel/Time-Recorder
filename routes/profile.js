@@ -128,35 +128,66 @@ router.post('/image', ensureAuthenticated, function(req,res,next){
 
 //TimeIn
 router.post('/timein/:dates/:tin', ensureAuthenticated,  function(req,res,next){
-	Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, user){
-		if(user.timein.length == user.timeout.length){
-			let query = {user_id: req.user.id, date: req.params.dates};
-			let status_query = {user_id: req.user.id, date: req.params.dates, 'status.status': 'Absent'};
-			var timein = moment().format('HH:mm:ss');
-			var sched = moment(req.params.dates + ' ' +req.body.sched_in).add(1,'m').format('HH:mm:ss');
-			var time = {
-				timein: timein
+	Account.getAccountByTeam(req.user.team, function(err,acc){
+		var lati = req.body.lat;
+		var long = req.body.lon;
+		var l_name = "";
+		acc.locations.forEach(function(location){
+			var lon1 = location.lon + 0.005;
+			var lon2 = location.lon - 0.005;
+			var lat1 = location.lat + 0.005;
+			var lat2 = location.lat - 0.005;
+			if(lon1>=long<=lon2 && lat1>=lati<=lat2 && l_name==""){
+				l_name = location.location_name;
 			}
-			if(timein > sched){
-				var status = {
-					status: "Late"
+		});
+			Time.getTimeLogsByUserAndDate(req.user.id, req.params.dates, function(err, user){
+				if(user.timein.length == user.timeout.length){
+					let query = {user_id: req.user.id, date: req.params.dates};
+					let status_query = {user_id: req.user.id, date: req.params.dates, 'status.status': 'Absent'};
+					var timein = moment().format('HH:mm:ss');
+					var sched = moment(req.params.dates + ' ' +req.body.sched_in).add(1,'m').format('HH:mm:ss');
+					var time = {
+						timein: timein
+					}
+					if(l_name !== ""){
+						var time = {
+							timein: timein,
+							location: l_name
+						}
+						Time.addTimeIn(query, time, function(err, tin){});
+					} else {
+						var time = {
+							timein: timein,
+							location: 'No Location'
+						}
+						Time.addTimeIn(query, time, function(err, tin){});
+					}
+					if(timein > sched){
+						var status = {
+							status: "Late"
+						}
+						if(user.status.length == user.timein.length){
+							Time.addStatus(query, status, function(err, data){});
+						} else {
+							Time.updateStatus(status_query, status, function(err, data){});
+						}
+					} else {
+						var status = {
+							status: "Present"
+						}
+						if(user.status.length == user.timein.length){
+							Time.addStatus(query, status, function(err, data){});
+						} else {
+							Time.updateStatus(status_query, status, function(err, data){});
+						}
+					}
 				}
-				if(user.status.length == user.timein.length){
-					Time.addStatus(query, status, function(err, data){});
-				} else {
-					Time.updateStatus(status_query, status, function(err, data){});
-				}
-			} else {
-				var status = {
-					status: "Present"
-				}
-				if(user.status.length == user.timein.length){
-					Time.addStatus(query, status, function(err, data){});
-				} else {
-					Time.updateStatus(status_query, status, function(err, data){});
-				}
-			}
-			Time.addTimeIn(query, time, function(err, tin){});
+			});
+		if(l_name !== ""){
+			req.flash('success_msg', 'You are currently at ' + l_name);
+		} else {
+			req.flash('error_msg', 'Location not registered');
 		}
 		res.redirect('/profile');
 	});
