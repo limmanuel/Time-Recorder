@@ -137,7 +137,8 @@ router.post('/timein/:dates/:tin', ensureAuthenticated,  function(req,res,next){
 			var lon2 = location.lon - 0.005;
 			var lat1 = location.lat + 0.005;
 			var lat2 = location.lat - 0.005;
-			if(lon1>=long<=lon2 && lat1>=lati<=lat2 && l_name==""){
+			if(lon1>=long && long<=lon2 && lat1>=lati && lati<=lat2 && l_name==""){
+				console.log(lon1+'-'+long+'-'+lon2+'-'+lat1+'-'+lati+'-'+lat2);
 				l_name = location.location_name;
 			}
 		});

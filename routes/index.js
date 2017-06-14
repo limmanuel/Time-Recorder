@@ -73,44 +73,18 @@ cron.schedule('*/5 * * * * 1-5', function(){
 													Time.addTimeOut(query, timeout, function(err, tout){});
 												}
 											} else {
-												var sched_out = account.sched_out+':00';
-												var time = moment().format('HH:MM:ss');
-												if(time >= sched_out){
-													Time.getTimeLogsByUserAndDate(userid, moment().format('MM-DD-YYYY'), function(err, user){
-														if(user.timein[0]){} else{
-															let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': 'Absent'};
-															var timein = {
-																timein: "N/A"
-															}
-															var breakin = {
-																breakin: "N/A"
-															}
-															var breakout = {
-																breakout: "N/A"
-															}
-															var timeout = {
-																timeout: "N/A"
-															}
-															Time.addTimeIn(query, timein, function(err, tin){});
-															Time.addBreakIn(query, breakin, function(err, bin){});
-															Time.addBreakOut(query, breakout, function(err, bout){});
-															Time.addTimeOut(query, timeout, function(err, tout){});
-														}
-													});
-												} else {
-													var breakin = {
-														breakin: 'N/A'
-													}
-													var breakout = {
-														breakout: 'N/A'
-													}
-													var timeout = {
-														timeout: account.sched_out+':00'
-													}
-													Time.addBreakIn(query, breakin, function(err, bin){});
-													Time.addBreakOut(query, breakout, function(err, bout){});
-													Time.addTimeOut(query, timeout, function(err, tout){});
+												var breakin = {
+													breakin: 'N/A'
 												}
+												var breakout = {
+													breakout: 'N/A'
+												}
+												var timeout = {
+													timeout: account.sched_out+':00'
+												}
+												Time.addBreakIn(query, breakin, function(err, bin){});
+												Time.addBreakOut(query, breakout, function(err, bout){});
+												Time.addTimeOut(query, timeout, function(err, tout){});
 											}
 										}
 									});
@@ -157,26 +131,40 @@ cron.schedule('*/5 * * * * 1-5', function(){
 										timeout: [],
 										breakin: [],
 										breakout: [],
-										status: []
+										status: [{
+											status: "Absent"
+										}]
 									});
 									newLog.save(function(err){
 										if(err){
 											console.log(err);
 										}
-										let query = {user_id: userid, date: moment().format('MM-DD-YYYY')}
-										var sched_in = account.sched_in+':00';
-										var time = moment().format('HH:MM:ss');
-										if(time >= sched_in){
-											var status = {
-												status: "Absent"
-											}
-										} else {
-											var status = {
-												status: "Absent"
-											}
-										}
-										Time.addStatus(query, status, function(err, data){});
 										l=1;
+									});
+								}
+								var sched_out = account.sched_out+':00';
+								var time = moment().format('HH:MM:ss');
+								if(time >= sched_out){
+									let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': 'Absent'};
+									Time.getTimeLogsByUserAndDate(userid, moment().format('MM-DD-YYYY'), function(err, log){
+										if(log.timein.length > 0){
+											var timein = {
+												timein: "N/A"
+											}
+											var breakin = {
+												breakin: "N/A"
+											}
+											var breakout = {
+												breakout: "N/A"
+											}
+											var timeout = {
+												timeout: "N/A"
+											}
+											Time.addTimeIn(query, timein, function(err, tin){});
+											Time.addBreakIn(query, breakin, function(err, bin){});
+											Time.addBreakOut(query, breakout, function(err, bout){});
+											Time.addTimeOut(query, timeout, function(err, tout){});
+										}
 									});
 								}
 							});
