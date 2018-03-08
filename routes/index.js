@@ -147,6 +147,7 @@ cron.schedule('*/5 * * * * 1-5', function(){
 								if(time >= sched_out){
 									let query = {user_id: userid, date: moment().format('MM-DD-YYYY'), 'status.status': 'Absent'};
 									Time.getTimeLogsByUserAndDate(userid, moment().format('MM-DD-YYYY'), function(err, log){
+										if(log){
 										if(log.timein.length > 0){
 											var timein = {
 												timein: "N/A"
@@ -164,6 +165,7 @@ cron.schedule('*/5 * * * * 1-5', function(){
 											Time.addBreakIn(query, breakin, function(err, bin){});
 											Time.addBreakOut(query, breakout, function(err, bout){});
 											Time.addTimeOut(query, timeout, function(err, tout){});
+										}
 										}
 									});
 								}
